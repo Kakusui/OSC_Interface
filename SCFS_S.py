@@ -13,25 +13,25 @@ from datetime import datetime
 
 def startup():
     
-    scf1 = r'C:\Users\Tetra\Desktop\SCF'
+    scf1 = r'C:\\Users\\Tetra\\Desktop\\SCF'
 
-    tafunuha = r'C:\Users\Tetra\Desktop\SCF\tafunuha'
-    rahahinukawa = r'C:\Users\Tetra\Desktop\SCF\rahahinukawa'
-    NuharunuNihamemekayahame = r'C:\Users\Tetra\Desktop\SCF\NuharunuNihamemekayahame'
-    NisoMehademaRakasuni = r'C:\Users\Tetra\Desktop\SCF\NisoMehademaRakasuni'
-    MehademaRakasuniKasunu = r'C:\Users\Tetra\Desktop\SCF\MehademaRakasuniKasunu'
+    tafunuha = r'C:\\Users\\Tetra\\Desktop\\SCF\\tafunuha'
+    rahahinukawa = r'C:\\Users\\Tetra\\Desktop\\SCF\\rahahinukawa'
+    NuharunuNihamemekayahame = r'C:\\Users\\Tetra\\Desktop\\SCF\\NuharunuNihamemekayahame'
+    NisoMehademaRakasuni = r'C:\\Users\\Tetra\\Desktop\\SCF\\NisoMehademaRakasuni'
+    MehademaRakasuniKasunu = r'C:\\Users\\Tetra\\Desktop\\SCF\\MehademaRakasuniKasunu'
 
-    tafunuha2 = r'C:\Users\Tetra\Desktop\SCF\tafunuha\Current Iteration'
-    rahahinukawa2 = r'C:\Users\Tetra\Desktop\SCF\rahahinukawa\Current Iteration'
-    NuharunuNihamemekayahame2 = r'C:\Users\Tetra\Desktop\SCF\NuharunuNihamemekayahame\Current Iteration'
-    NisoMehademaRakasuni2 = r'C:\Users\Tetra\Desktop\SCF\NisoMehademaRakasuni\Current Iteration'
-    MehademaRakasuniKasunu2 = r'C:\Users\Tetra\Desktop\SCF\MehademaRakasuniKasunu\Current Iteration'
+    tafunuha2 = r'C:\\Users\\Tetra\\Desktop\\SCF\\tafunuha\\Current Iteration'
+    rahahinukawa2 = r'C:\\Users\\Tetra\\Desktop\\SCF\\rahahinukawa\\Current Iteration'
+    NuharunuNihamemekayahame2 = r'C:\\Users\\Tetra\\Desktop\\SCF\\NuharunuNihamemekayahame\\Current Iteration'
+    NisoMehademaRakasuni2 = r'C:\\Users\\Tetra\\Desktop\\SCF\\NisoMehademaRakasuni\\Current Iteration'
+    MehademaRakasuniKasunu2 = r'C:\\Users\\Tetra\\Desktop\\SCF\\MehademaRakasuniKasunu\\Current Iteration'
 
-    tafunuha3 = r'C:\Users\Tetra\Desktop\SCF\tafunuha\Current Iteration\iteration.txt'
-    rahahinukawa3 = r'C:\Users\Tetra\Desktop\SCF\rahahinukawa\Current Iteration\iteration.txt'
-    NuharunuNihamemekayahame3 = r'C:\Users\Tetra\Desktop\SCF\NuharunuNihamemekayahame\Current Iteration\iteration.txt'
-    NisoMehademaRakasuni3 = r'C:\Users\Tetra\Desktop\SCF\NisoMehademaRakasuni\Current Iteration\iteration.txt'
-    MehademaRakasuniKasunu3 = r'C:\Users\Tetra\Desktop\SCF\MehademaRakasuniKasunu\Current Iteration\iteration.txt'
+    tafunuha3 = r'C:\\Users\\Tetra\\Desktop\\SCF\\tafunuha\\Current Iteration\\iteration.txt'
+    rahahinukawa3 = r'C:\\Users\\Tetra\Desktop\SCF\\rahahinukawa\\Current Iteration\\iteration.txt'
+    NuharunuNihamemekayahame3 = r'C:\\Users\\Tetra\Desktop\SCF\\NuharunuNihamemekayahame\\Current Iteration\\iteration.txt'
+    NisoMehademaRakasuni3 = r'C:\\Users\\Tetra\\Desktop\SCF\\NisoMehademaRakasuni\\Current Iteration\\iteration.txt'
+    MehademaRakasuniKasunu3 = r'C:\\Users\\Tetra\\Desktop\\SCF\\MehademaRakasuniKasunu\\Current Iteration\\iteration.txt'
 
     if(os.path.isdir(scf1) == False):
         os.mkdir(scf1, 0o666)
@@ -162,8 +162,10 @@ def delete_files(mfd_file_id):
         batch.add(service.files().delete(fileId=f['id']))
         i += 1
 
+    if(i != 0):
+        print("Deleting Files")
+
     batch.execute()
-    print("Deleting files")
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
@@ -192,6 +194,7 @@ def get_file_path(Set): ## used to determine where files downloaded from the dri
         Iteration = int(f.read())
 
     os.makedirs(path, exist_ok=True)
+    
     dFile = path + "/" + directory + "-" + str(Iteration)
     Iteration += 1
 
@@ -200,36 +203,47 @@ def get_file_path(Set): ## used to determine where files downloaded from the dri
 
     return dFile
 
-#-------------------Start-of-move_scf()-------------------------------------------------
+#-------------------Start-of-move_folders()-------------------------------------------------
 
-def move_scf():
-    
-    drivePath = "E:\\" # Replace this with the path of the drive you want to check
+def move_folders():
 
-    if os.path.exists(drivePath):
-        pass
-    else:
+    drivePath = "E:\\"
+
+    if not os.path.exists(drivePath):
         return
+    
+    print("Moving Folders")
 
     scf1 = r'C:\Users\Tetra\Desktop\SCF'
     scf2 = r'E:\SCF'
 
-    if os.path.isdir(scf2) == False:
-        os.mkdir(scf2, 0o666)
-        print(scf2 + " created due to lack of the folder")
+    Nuse = r'C:\Users\Tetra\Desktop\Nusevei'
+    NuseBase = r'C:\Users\Tetra\Desktop\Nusevei\Nuse Backups'
 
-    for subDir, files in os.walk(scf1):
+    for dirpath, dirnames, filenames in os.walk(scf1):
+        for filename in filenames:
+            sourcePath = os.path.join(dirpath, filename)
+            destinationSubDir = dirpath.split(scf1)[1]
+            destinationPath = os.path.join(scf2, destinationSubDir, filename)
+            if not os.path.exists(destinationPath):
+                os.makedirs(os.path.dirname(destinationPath), exist_ok=True)
+                shutil.copy(sourcePath, destinationPath)
 
-        destinationSubDir = subDir.replace(scf1, scf2, 1)
-        os.makedirs(destinationSubDir, exist_ok=True)
-
-        for file in files:
-
-            sourcePath = os.path.join(subDir, file)
-            destinationPath = os.path.join(destinationSubDir, file)
-            shutil.copy(sourcePath, destinationPath)
+    for dirpath, dirnames, filenames in os.walk(Nuse):
+        for filename in filenames:
+            sourcePath = os.path.join(dirpath, filename)
+            destinationSubDir = dirpath.split(Nuse)[1]
+            destinationPath = os.path.join(drivePath, destinationSubDir, filename)
+            if not os.path.exists(destinationPath):
+                os.makedirs(os.path.dirname(destinationPath), exist_ok=True)
+                shutil.copy(sourcePath, destinationPath)
 
     shutil.rmtree(scf1)
+    shutil.rmtree(NuseBase)
+
+    sleep(.1)
+
+    os.mkdir(NuseBase)
 
 #-------------------Start-of-main()-------------------------------------------------
 
@@ -275,4 +289,4 @@ mfad_file_id = download_files('1dfMMfbw4vkQI1YUCvBdhuvHbvMch44fn',mfad_file_id,5
 
 delete_files(mfad_file_id)
 
-move_scf()
+move_folders()
