@@ -249,6 +249,21 @@ def move_folders():
 
 os.system("title " + "SCFS_S.py")
 
+drivePath = "E:\\"
+
+if(not os.path.exists(drivePath)):
+    print("E:\\ Does not exist\n\n")
+
+    os.system('pause')
+    exit()
+
+with open("C:\\ProgramData\\SCFS\\lastRun.txt", "r+") as f:
+    if(f.read() == datetime.now().strftime("%m/%d/%Y")):
+        print("Already ran today\n\n")
+
+        os.system('pause')
+        exit()
+
 startup()
 
 sleep(.17)
@@ -287,6 +302,11 @@ mfad_file_id = download_files('1KjfiXX6r9UGi7UX5VYb5SMJtSEwkjiS2',mfad_file_id,4
 
 mfad_file_id = download_files('1dfMMfbw4vkQI1YUCvBdhuvHbvMch44fn',mfad_file_id,5) ## Tafunuha Level
 
+move_folders()
+
 delete_files(mfad_file_id)
 
-move_folders()
+currentDate = datetime.now().strftime("%m/%d/%Y")
+
+with open("C:\\ProgramData\\SCFS\\lastRun.txt", "w+") as f:
+    f.write(currentDate)
