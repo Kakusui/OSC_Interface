@@ -93,27 +93,27 @@ def startup():
     if(os.path.exists(tafunuha3) == False):
         print(tafunuha3 + " was created due to lack of the file")
         with open(tafunuha3, "w+", encoding="utf-8") as file:
-            file.write("0")
+            file.write("1")
 
     if(os.path.exists(rahahinukawa3) == False):
         print(rahahinukawa3 + " was created due to lack of the file")
         with open(rahahinukawa3, "w+", encoding="utf-8") as file:
-            file.write("0")
+            file.write("1")
 
     if(os.path.exists(NuharunuNihamemekayahame3) == False):
         print(NuharunuNihamemekayahame3 + " was created due to lack of the file")
         with open(NuharunuNihamemekayahame3, "w+", encoding="utf-8") as file:
-            file.write("0")
+            file.write("1")
 
     if(os.path.exists(NisoMehademaRakasuni3) == False):
         print(NisoMehademaRakasuni3 + " was created due to lack of the file")
         with open(NisoMehademaRakasuni3, "w+", encoding="utf-8") as file:
-            file.write("0")
+            file.write("1")
 
     if(os.path.exists(MehademaRakasuniKasunu3) == False):
         print(MehademaRakasuniKasunu3 + " was created due to lack of the file")
         with open(MehademaRakasuniKasunu3, "w+", encoding="utf-8") as file:
-            file.write("0")
+            file.write("1")
         
 
 #-------------------Start-of-download_files()-------------------------------------------------
