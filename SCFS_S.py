@@ -118,7 +118,7 @@ def startup():
 
 #-------------------Start-of-download_files()-------------------------------------------------
 
-def download_files(gfolder_id, mfad_file_id,Set):
+def download_files(gfolder_id, mfad_file_id, Set):
     
     i = 0
     
@@ -130,7 +130,7 @@ def download_files(gfolder_id, mfad_file_id,Set):
         ff = drive.CreateFile({'id': f['id']})
         dFile = get_file_path(Set)
         print("Downloading {} as {}".format(f['title'], dFile))
-        ff.GetContentFile(dFile + ".png")
+        ff.GetContentFile(dFile + "." + f['fileExtension'])
         i += 1
         dFile = ""
         f = None
@@ -265,13 +265,6 @@ with open("C:\\ProgramData\\SCFS\\lastRun.txt", "r+") as f:
         exit()
 
 startup()
-
-sleep(.17)
-
-try: 
-    gui.getWindowsWithTitle("SCFS_S.py")[0].minimize()
-except:
-    pass
 
 mfd_file_id,mfad_file_id = [],[]
 
