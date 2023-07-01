@@ -28,17 +28,36 @@ class SCFS:
 
     def __init__(self) -> None: # constructor for SCFS class
 
+        """
+        
+        Initializes the SCFS class.\n
+
+        Parameters:\n
+        None.\n
+
+        Returns:\n
+        None.\n
+
+        """
+
+
+        ##----------------------------------------------------------------dirs----------------------------------------------------------------
+
         ## the folder where all the config files are located
         self.config_dir = os.path.join(os.environ['USERPROFILE'],"SCFSconfig")
 
         ## path to the directory where the script is located
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
 
+        ##----------------------------------------------------------------paths----------------------------------------------------------------
+
         self.last_run_path = os.path.join(self.config_dir, "last_run.txt")
 
         self.client_json_path = os.path.join(self.config_dir, "client_secrets.json")
 
-        self.folder_ids = os.path.join(self.script_dir, "folder_ids.txt")
+        self.folder_id_path = os.path.join(self.script_dir, "folder_ids.txt")
+
+        ##----------------------------------------------------------------variables----------------------------------------------------------------
 
         self.marked_for_deletion = []
 
@@ -53,28 +72,50 @@ class SCFS:
 
     def start_SCFS(self):
 
+        """
+        
+        Start the SCFS process.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
+
+        ## if usb that we are transferring to does not exist than exit
         if(not os.path.exists(self.usb_path)):
             print("E:\\ Does not exist\n\n")
 
             util.pause_console()
             exit()
 
-        try:
-            with open(self.last_run_path, "r+") as f:
-                if(f.read() == datetime.now().strftime("%m/%d/%Y")):
-                    print("Already ran today\n\n")
+        ## no need to run multiple times a day
+        with open(self.last_run_path, "r+") as f:
+            if(f.read() == datetime.now().strftime("%m/%d/%Y")):
+                print("Already ran today\n")
 
-                    util.pause_console()
-                    exit()
-        except:
-            pass
+                util.pause_console()
+                exit()
 
-        self.setup_scf_folder()
         self.transfer()
 
 ##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     def setup_scf_folder(self):
+
+        """
+        
+        Setups the scf folder.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
         
         self.scf_dir = os.path.join(self.script_dir, "SCF")
 
@@ -120,6 +161,18 @@ class SCFS:
 
     def transfer(self):
 
+        """
+        
+        Begins the transfer process.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
+
         try:
             GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = self.client_json_path
             
@@ -136,6 +189,10 @@ class SCFS:
             
             exit()
 
+        util.clear_console()
+
+        self.setup_scf_folder()
+
         self.download_files()
 
         self.move_folders()
@@ -146,11 +203,24 @@ class SCFS:
 
         with open(self.last_run_path, "w+", encoding="utf-8") as file:
             file.write(currentDate)
+
 #-------------------Start-of-download_files()-------------------------------------------------
 
     def download_files(self):
+
+        """
         
-        with open(self.folder_ids, "r+", encoding="utf-8") as file:
+        Downloads all files in a google drive folder.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
+        
+        with open(self.folder_id_path, "r+", encoding="utf-8") as file:
             gfolder_ids = file.readlines()
 
         for i, id in enumerate(gfolder_ids):
@@ -165,12 +235,12 @@ class SCFS:
 
                 ff = self.drive.CreateFile({'id': f['id']})
 
-                dFile = self.get_file_path(i+1)
+                file_path = self.get_file_path(i+1)
 
-                print("Downloading {} as {}".format(f['title'], dFile))
-                ff.GetContentFile(dFile + "." + f['fileExtension'])
+                print("Downloading {} as {}".format(f['title'], file_path))
+                ff.GetContentFile(file_path + "." + f['fileExtension'])
                 i += 1
-                dFile = ""
+                file_path = ""
                 f = None
                 ff = None
 
@@ -178,6 +248,18 @@ class SCFS:
 #-------------------Start-of-delete_files()-------------------------------------------------
 
     def delete_files(self):
+
+        """
+        
+        Deletes all files that have been marked for deletion.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
 
         i = 0
 
@@ -202,7 +284,19 @@ class SCFS:
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
-    def get_file_path(self, Set): ## used to determine where files downloaded from the drive will go
+    def get_file_path(self, file_type):
+
+        """
+        
+        Gets a new file path for a downloaded file.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """ 
         
         directory = datetime.today().strftime('%Y-%m-%d')
 
@@ -221,24 +315,36 @@ class SCFS:
             5: self.tafunuha_iteration_path
         }
         
-        path = os.path.join(filePaths[Set], directory)
+        path = os.path.join(filePaths[file_type], directory)
 
-        with open(iterationPaths[Set], "r", encoding="utf8") as f:
+        with open(iterationPaths[file_type], "r", encoding="utf8") as f:
             Iteration = int(f.read())
 
         os.makedirs(path, exist_ok=True)
         
-        dFile = path + "/" + directory + "-" + str(Iteration)
+        file_path = path + "/" + directory + "-" + str(Iteration)
         Iteration += 1
 
-        with open(iterationPaths[Set], "w", encoding="utf8") as f:
+        with open(iterationPaths[file_type], "w", encoding="utf8") as f:
             f.write(str(Iteration))
 
-        return dFile
+        return file_path
 
-#-------------------Start-of-move_folders()-------------------------------------------------
+##-------------------start-of-move_folders()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     def move_folders(self):
+
+        """
+        
+        Transfers all downloaded files to the designated usb.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
         
         print("Moving Folders")
 
