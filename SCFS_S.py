@@ -1,16 +1,14 @@
 ## built-in modules
-from time import sleep 
-
-import pyautogui as gui
+import ctypes
+import datetime
+import time
 import os
 import shutil
 
 ## third party modules
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-from ctypes import *
 from apiclient import discovery
-from datetime import datetime
 
 ## custom modules
 from modules import util
@@ -20,13 +18,13 @@ class SCFS:
 
     """
     
-    The SCFS class, used for backing up files.
+    The SCFS class, used for backing up files.\n
 
     """
 
 ##-------------------start-of-__init__()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self) -> None: # constructor for SCFS class
+    def __init__(self) -> None:
 
         """
         
@@ -64,7 +62,7 @@ class SCFS:
         ## the path to the usb device we are transferring to
         self.usb_path = "E:\\"
 
-        os.system("title " + "SCFS_S.py")
+        os.system("title " + "SCFS")
 
         self.start_SCFS()
 
@@ -93,7 +91,7 @@ class SCFS:
 
         ## no need to run multiple times a day
         with open(self.last_run_path, "r+") as f:
-            if(f.read() == datetime.now().strftime("%m/%d/%Y")):
+            if(f.read() == datetime.datetime.now().strftime("%m/%d/%Y")):
                 print("Already ran today\n")
 
                 util.pause_console()
@@ -193,13 +191,21 @@ class SCFS:
 
         self.setup_scf_folder()
 
+        print("\n)")
+
         self.download_files()
+
+        print("\n)")
 
         self.move_folders()
 
+        print("\n)")
+
         self.delete_files()
 
-        currentDate = datetime.now().strftime("%m/%d/%Y")
+        print("\n)")
+
+        currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
 
         with open(self.last_run_path, "w+", encoding="utf-8") as file:
             file.write(currentDate)
@@ -243,7 +249,6 @@ class SCFS:
                 file_path = ""
                 f = None
                 ff = None
-
 
 #-------------------Start-of-delete_files()-------------------------------------------------
 
@@ -298,7 +303,7 @@ class SCFS:
 
         """ 
         
-        directory = datetime.today().strftime('%Y-%m-%d')
+        directory = datetime.datetime.today().strftime('%Y-%m-%d')
 
         filePaths = {
             1: self.NisoMehademaRakasuni_dir,
@@ -348,35 +353,37 @@ class SCFS:
         
         print("Moving Folders")
 
-        scf2 = r'E:\SCF'
+        destination_scf = os.path.join(self.usb_path, "SCF")
 
-        Nuse = r'C:\Users\Tetra\Desktop\Nusevei'
-        NuseBase = r'C:\Users\Tetra\Desktop\Nusevei\Nuse Backups'
+        os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei")
 
-        for dirpath, dirnames, filenames in os.walk(self.scf_dir):
-            for filename in filenames:
-                sourcePath = os.path.join(dirpath, filename)
-                destinationSubDir = dirpath.split(self.scf_dir)[1]
-                destinationPath = os.path.join(scf2, destinationSubDir, filename)
-                if not os.path.exists(destinationPath):
-                    os.makedirs(os.path.dirname(destinationPath), exist_ok=True)
-                    shutil.copy(sourcePath, destinationPath)
+        nusevei_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei")
+        nusevei_backup_destination = os.path.join(os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei"), "Nuse Backups")
 
-        for dirpath, dirnames, filenames in os.walk(Nuse):
-            for filename in filenames:
-                sourcePath = os.path.join(dirpath, filename)
-                destinationSubDir = dirpath.split(Nuse)[1]
-                destinationPath = os.path.join(self.usb_path, destinationSubDir, filename)
-                if not os.path.exists(destinationPath):
-                    os.makedirs(os.path.dirname(destinationPath), exist_ok=True)
-                    shutil.copy(sourcePath, destinationPath)
+        for dir_path, dir_names, file_names in os.walk(self.scf_dir):
+            for file_name in file_names:
+                source_path = os.path.join(dir_path, file_name)
+                destination_sub_dir = dir_path.split(self.scf_dir)[1]
+                destination_path = os.path.join(destination_scf, destination_sub_dir, file_name)
+                if(not os.path.exists(destination_path)):
+                    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+                    shutil.copy(source_path, destination_path)
+
+        for dir_path, dir_names, file_names in os.walk(nusevei_backups):
+            for file_name in file_names:
+                source_path = os.path.join(dir_path, file_name)
+                destination_sub_dir = dir_path.split(nusevei_backups)[1]
+                destination_path = os.path.join(self.usb_path, destination_sub_dir, file_name)
+                if(not os.path.exists(destination_path)):
+                    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+                    shutil.copy(source_path, destination_path)
 
         shutil.rmtree(self.scf_dir)
-        shutil.rmtree(NuseBase)
+        shutil.rmtree(nusevei_backup_destination)
 
-        sleep(.1)
+        time.sleep(.1)
 
-        os.mkdir(NuseBase)
+        os.mkdir(nusevei_backup_destination)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
