@@ -122,18 +122,21 @@ class SCFS:
         self.NuharunuNihamemekayahame_dir = os.path.join(self.scf_dir, "NuharunuNihamemekayahame")
         self.NisoMehademaRakasuni_dir = os.path.join(self.scf_dir, "NisoMehademaRakasuni")
         self.MehademaRakasuniKasunu_dir = os.path.join(self.scf_dir, "MehademaRakasuniKasunu")
+        self.TaninMehademaRakasuni_dir = os.path.join(self.scf_dir, "TaninMehademaRakasuni")
 
         self.tafunuha_iteration_dir = os.path.join(self.tafunuha_dir, "Current Iteration")
         self.rahahinukawa_iteration_dir = os.path.join(self.rahahinukawa_dir, "Current Iteration")
         self.NuharunuNihamemekayahame_iteration_dir = os.path.join(self.NuharunuNihamemekayahame_dir, "Current Iteration")
         self.NisoMehademaRakasuni_iteration_dir = os.path.join(self.NisoMehademaRakasuni_dir, "Current Iteration")
         self.MehademaRakasuniKasunu_iteration_dir = os.path.join(self.MehademaRakasuniKasunu_dir, "Current Iteration")
+        self.TaninMehademaRakasuni_iteration_dir = os.path.join(self.TaninMehademaRakasuni_dir, "Current Iteration")
 
         self.tafunuha_iteration_path = os.path.join(self.tafunuha_iteration_dir, "iteration.txt")
         self.rahahinukawa_iteration_path = os.path.join(self.rahahinukawa_iteration_dir, "iteration.txt")
         self.NuharunuNihamemekayahame_iteration_path = os.path.join(self.NuharunuNihamemekayahame_iteration_dir, "iteration.txt")
         self.NisoMehademaRakasuni_iteration_path = os.path.join(self.NisoMehademaRakasuni_iteration_dir, "iteration.txt")
         self.MehademaRakasuniKasunu_iteration_path = os.path.join(self.MehademaRakasuniKasunu_iteration_dir, "iteration.txt")
+        self.TaninMehademaRakasuni_iteration_path = os.path.join(self.TaninMehademaRakasuni_iteration_dir, "iteration.txt")
 
         util.standard_create_directory(self.scf_dir)
 
@@ -142,18 +145,21 @@ class SCFS:
         util.standard_create_directory(self.NuharunuNihamemekayahame_dir)
         util.standard_create_directory(self.NisoMehademaRakasuni_dir)
         util.standard_create_directory(self.MehademaRakasuniKasunu_dir)
+        util.standard_create_directory(self.TaninMehademaRakasuni_dir)
 
         util.standard_create_directory(self.tafunuha_iteration_dir)
         util.standard_create_directory(self.rahahinukawa_iteration_dir)
         util.standard_create_directory(self.NuharunuNihamemekayahame_iteration_dir)
         util.standard_create_directory(self.NisoMehademaRakasuni_iteration_dir)
         util.standard_create_directory(self.MehademaRakasuniKasunu_iteration_dir)
+        util.standard_create_directory(self.TaninMehademaRakasuni_iteration_dir)
 
         util.modified_create_file(self.tafunuha_iteration_path, "1")
         util.modified_create_file(self.rahahinukawa_iteration_path, "1")
         util.modified_create_file(self.NuharunuNihamemekayahame_iteration_path, "1")
         util.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
         util.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
+        util.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
 
 ##-------------------start-of-transfer()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -231,8 +237,10 @@ class SCFS:
 
         for i, id in enumerate(gfolder_ids):
 
+            if(i >= 6):
+                break
+
             id = id.strip()
-        
             query = "mimeType != 'application/vnd.google-apps.folder' and trashed = false and '{}' in parents".format(id)
             fileList = self.drive.ListFile({'q': query}).GetList()
 
@@ -241,14 +249,15 @@ class SCFS:
 
                 ff = self.drive.CreateFile({'id': f['id']})
 
-                file_path = self.get_file_path(i+1)
+                file_path = self.get_file_path(i + 1)
 
                 print("Downloading {} as {}".format(f['title'], file_path))
                 ff.GetContentFile(file_path + "." + f['fileExtension'])
-                i += 1
+
                 file_path = ""
                 f = None
                 ff = None
+
 
 #-------------------Start-of-delete_files()-------------------------------------------------
 
@@ -310,14 +319,16 @@ class SCFS:
             2: self.MehademaRakasuniKasunu_dir,
             3: self.NuharunuNihamemekayahame_dir,
             4: self.rahahinukawa_dir,
-            5: self.tafunuha_dir
+            5: self.tafunuha_dir,
+            6: self.TaninMehademaRakasuni_dir
         }
         iterationPaths = {
             1: self.NisoMehademaRakasuni_iteration_path,
             2: self.MehademaRakasuniKasunu_iteration_path,
             3: self.NuharunuNihamemekayahame_iteration_path,
             4: self.rahahinukawa_iteration_path,
-            5: self.tafunuha_iteration_path
+            5: self.tafunuha_iteration_path,
+            6: self.TaninMehademaRakasuni_iteration_path
         }
         
         path = os.path.join(filePaths[file_type], directory)
