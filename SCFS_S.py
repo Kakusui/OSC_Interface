@@ -373,7 +373,7 @@ class SCFS:
         """
 
         ## destination folder for the scf folder
-        destination_scf = os.path.join(os.path.join(self.usb_path, "SCF"), "SCF")
+        destination_scf = os.path.join(self.usb_path, "SCF")
 
         ## the paths to the usb device we are transferring to for seinu and nuse
         usb_nuse = os.path.join(self.usb_path, "Nuse Backups")
@@ -408,9 +408,11 @@ class SCFS:
 
         try:
             shutil.rmtree(nusevei_backup_actual)
+            os.mkdir(nusevei_backup_actual)
 
         except:
             pass
+        
 
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -423,7 +425,7 @@ class SCFS:
         Parameters:\n
         source_directory (str): The source directory path.\n
         destination_directory (str): The destination directory path.\n
-        overwrite (bool): If True, overwrite existing files in the destination directory (default is False).\n
+        overwrite (bool): If True, overwrite existing files but not directories in the destination directory (default is False).\n
 
         Returns:\n
         None.\n
@@ -441,12 +443,8 @@ class SCFS:
                 shutil.copy2(source_item, destination_item)
                 
             elif(os.path.isdir(source_item)):
-                if(os.path.exists(destination_item) and overwrite):
-                    if(os.path.isdir(destination_item)):
-                        shutil.rmtree(destination_item)  # Remove existing directory
-                    else:
-                        os.remove(destination_item)  # Remove existing file
-                shutil.copytree(source_item, destination_item, copy_function=shutil.copy2)
+                if(not os.path.exists(destination_item)):
+                    shutil.copytree(source_item, destination_item, copy_function=shutil.copy2)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
