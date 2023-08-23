@@ -1,8 +1,7 @@
 ## built-in modules
-import ctypes
 import datetime
-import time
 import os
+import ctypes
 import shutil
 
 ## third party modules
@@ -62,13 +61,23 @@ class SCFS:
         ## the path to the usb device we are transferring to
         self.usb_path = "E:\\"
 
+        #----------------------------------------------------------------run----------------------------------------------------------------
+
         os.system("title " + "SCFS")
+
+        util.standard_create_directory(self.config_dir)
+
+        util.standard_create_file(self.client_json_path)
+
+        util.standard_create_file(self.folder_id_path)
+
+        util.modified_create_file(self.last_run_path, "")
 
         self.start_SCFS()
 
 ##-------------------start-of-start_SCFS()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def start_SCFS(self):
+    def start_SCFS(self) -> None:
 
         """
         
@@ -99,71 +108,9 @@ class SCFS:
 
         self.transfer()
 
-##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    def setup_scf_folder(self):
-
-        """
-        
-        Setups the scf folder.\n
-
-        Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
-
-        Returns:\n
-        None.\n
-
-        """
-        
-        self.scf_dir = os.path.join(self.script_dir, "SCF")
-
-        self.tafunuha_dir = os.path.join(self.scf_dir, "tafunuha")
-        self.rahahinukawa_dir = os.path.join(self.scf_dir, "rahahinukawa")
-        self.NuharunuNihamemekayahame_dir = os.path.join(self.scf_dir, "NuharunuNihamemekayahame")
-        self.NisoMehademaRakasuni_dir = os.path.join(self.scf_dir, "NisoMehademaRakasuni")
-        self.MehademaRakasuniKasunu_dir = os.path.join(self.scf_dir, "MehademaRakasuniKasunu")
-        self.TaninMehademaRakasuni_dir = os.path.join(self.scf_dir, "TaninMehademaRakasuni")
-
-        self.tafunuha_iteration_dir = os.path.join(self.tafunuha_dir, "Current Iteration")
-        self.rahahinukawa_iteration_dir = os.path.join(self.rahahinukawa_dir, "Current Iteration")
-        self.NuharunuNihamemekayahame_iteration_dir = os.path.join(self.NuharunuNihamemekayahame_dir, "Current Iteration")
-        self.NisoMehademaRakasuni_iteration_dir = os.path.join(self.NisoMehademaRakasuni_dir, "Current Iteration")
-        self.MehademaRakasuniKasunu_iteration_dir = os.path.join(self.MehademaRakasuniKasunu_dir, "Current Iteration")
-        self.TaninMehademaRakasuni_iteration_dir = os.path.join(self.TaninMehademaRakasuni_dir, "Current Iteration")
-
-        self.tafunuha_iteration_path = os.path.join(self.tafunuha_iteration_dir, "iteration.txt")
-        self.rahahinukawa_iteration_path = os.path.join(self.rahahinukawa_iteration_dir, "iteration.txt")
-        self.NuharunuNihamemekayahame_iteration_path = os.path.join(self.NuharunuNihamemekayahame_iteration_dir, "iteration.txt")
-        self.NisoMehademaRakasuni_iteration_path = os.path.join(self.NisoMehademaRakasuni_iteration_dir, "iteration.txt")
-        self.MehademaRakasuniKasunu_iteration_path = os.path.join(self.MehademaRakasuniKasunu_iteration_dir, "iteration.txt")
-        self.TaninMehademaRakasuni_iteration_path = os.path.join(self.TaninMehademaRakasuni_iteration_dir, "iteration.txt")
-
-        util.standard_create_directory(self.scf_dir)
-
-        util.standard_create_directory(self.tafunuha_dir)
-        util.standard_create_directory(self.rahahinukawa_dir)
-        util.standard_create_directory(self.NuharunuNihamemekayahame_dir)
-        util.standard_create_directory(self.NisoMehademaRakasuni_dir)
-        util.standard_create_directory(self.MehademaRakasuniKasunu_dir)
-        util.standard_create_directory(self.TaninMehademaRakasuni_dir)
-
-        util.standard_create_directory(self.tafunuha_iteration_dir)
-        util.standard_create_directory(self.rahahinukawa_iteration_dir)
-        util.standard_create_directory(self.NuharunuNihamemekayahame_iteration_dir)
-        util.standard_create_directory(self.NisoMehademaRakasuni_iteration_dir)
-        util.standard_create_directory(self.MehademaRakasuniKasunu_iteration_dir)
-        util.standard_create_directory(self.TaninMehademaRakasuni_iteration_dir)
-
-        util.modified_create_file(self.tafunuha_iteration_path, "1")
-        util.modified_create_file(self.rahahinukawa_iteration_path, "1")
-        util.modified_create_file(self.NuharunuNihamemekayahame_iteration_path, "1")
-        util.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
-        util.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
-        util.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
-
 ##-------------------start-of-transfer()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def transfer(self):
+    def transfer(self) -> None:
 
         """
         
@@ -193,32 +140,95 @@ class SCFS:
             
             exit()
 
+        # Get the handle of the console window
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+
+        # Maximize the console window
+        ctypes.windll.user32.ShowWindow(hwnd, 6)
+
         util.clear_console()
 
         self.setup_scf_folder()
 
-        print("\n)")
-
         self.download_files()
-
-        print("\n)")
 
         self.move_folders()
 
-        print("\n)")
-
         self.delete_files()
-
-        print("\n)")
 
         currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
 
         with open(self.last_run_path, "w+", encoding="utf-8") as file:
             file.write(currentDate)
 
+##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    def setup_scf_folder(self) -> None:
+
+        """
+        
+        Setups the scf folder.\n
+
+        Parameters:\n
+        self (object - SCFS) : the SCFS object.\n
+
+        Returns:\n
+        None.\n
+
+        """
+        
+        self.scf_dir = os.path.join(self.script_dir, "SCF")
+        self.scf_actual_dir = os.path.join(self.scf_dir, "SCF")
+
+        self.tafunuha_dir = os.path.join(self.scf_actual_dir, "tafunuha")
+        self.rahahinukawa_dir = os.path.join(self.scf_actual_dir, "rahahinukawa")
+        self.NuharunuNihamemekayahame_dir = os.path.join(self.scf_actual_dir, "NuharunuNihamemekayahame")
+        self.NisoMehademaRakasuni_dir = os.path.join(self.scf_actual_dir, "NisoMehademaRakasuni")
+        self.MehademaRakasuniKasunu_dir = os.path.join(self.scf_actual_dir, "MehademaRakasuniKasunu")
+        self.TaninMehademaRakasuni_dir = os.path.join(self.scf_actual_dir, "TaninMehademaRakasuni")
+
+        self.tafunuha_iteration_dir = os.path.join(self.tafunuha_dir, "Current Iteration")
+        self.rahahinukawa_iteration_dir = os.path.join(self.rahahinukawa_dir, "Current Iteration")
+        self.NuharunuNihamemekayahame_iteration_dir = os.path.join(self.NuharunuNihamemekayahame_dir, "Current Iteration")
+        self.NisoMehademaRakasuni_iteration_dir = os.path.join(self.NisoMehademaRakasuni_dir, "Current Iteration")
+        self.MehademaRakasuniKasunu_iteration_dir = os.path.join(self.MehademaRakasuniKasunu_dir, "Current Iteration")
+        self.TaninMehademaRakasuni_iteration_dir = os.path.join(self.TaninMehademaRakasuni_dir, "Current Iteration")
+
+        self.tafunuha_iteration_path = os.path.join(self.tafunuha_iteration_dir, "iteration.txt")
+        self.rahahinukawa_iteration_path = os.path.join(self.rahahinukawa_iteration_dir, "iteration.txt")
+        self.NuharunuNihamemekayahame_iteration_path = os.path.join(self.NuharunuNihamemekayahame_iteration_dir, "iteration.txt")
+        self.NisoMehademaRakasuni_iteration_path = os.path.join(self.NisoMehademaRakasuni_iteration_dir, "iteration.txt")
+        self.MehademaRakasuniKasunu_iteration_path = os.path.join(self.MehademaRakasuniKasunu_iteration_dir, "iteration.txt")
+        self.TaninMehademaRakasuni_iteration_path = os.path.join(self.TaninMehademaRakasuni_iteration_dir, "iteration.txt")
+
+        util.standard_create_directory(self.scf_dir)
+
+        util.standard_create_directory(self.scf_actual_dir)
+
+        util.standard_create_directory(self.tafunuha_dir)
+        util.standard_create_directory(self.rahahinukawa_dir)
+        util.standard_create_directory(self.NuharunuNihamemekayahame_dir)
+        util.standard_create_directory(self.NisoMehademaRakasuni_dir)
+        util.standard_create_directory(self.MehademaRakasuniKasunu_dir)
+        util.standard_create_directory(self.TaninMehademaRakasuni_dir)
+
+        util.standard_create_directory(self.tafunuha_iteration_dir)
+        util.standard_create_directory(self.rahahinukawa_iteration_dir)
+        util.standard_create_directory(self.NuharunuNihamemekayahame_iteration_dir)
+        util.standard_create_directory(self.NisoMehademaRakasuni_iteration_dir)
+        util.standard_create_directory(self.MehademaRakasuniKasunu_iteration_dir)
+        util.standard_create_directory(self.TaninMehademaRakasuni_iteration_dir)
+
+        util.modified_create_file(self.tafunuha_iteration_path, "1")
+        util.modified_create_file(self.rahahinukawa_iteration_path, "1")
+        util.modified_create_file(self.NuharunuNihamemekayahame_iteration_path, "1")
+        util.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
+        util.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
+        util.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
+
 #-------------------Start-of-download_files()-------------------------------------------------
 
-    def download_files(self):
+    def download_files(self) -> None:
 
         """
         
@@ -261,7 +271,7 @@ class SCFS:
 
 #-------------------Start-of-delete_files()-------------------------------------------------
 
-    def delete_files(self):
+    def delete_files(self) -> None:
 
         """
         
@@ -298,7 +308,7 @@ class SCFS:
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
-    def get_file_path(self, file_type):
+    def get_file_path(self, file_type) -> str:
 
         """
         
@@ -348,7 +358,7 @@ class SCFS:
 
 ##-------------------start-of-move_folders()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def move_folders(self):
+    def move_folders(self) -> None:
 
         """
         
@@ -361,40 +371,82 @@ class SCFS:
         None.\n
 
         """
-        
-        print("Moving Folders")
 
-        destination_scf = os.path.join(self.usb_path, "SCF")
+        ## destination folder for the scf folder
+        destination_scf = os.path.join(os.path.join(self.usb_path, "SCF"), "SCF")
 
-        os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei")
+        ## the paths to the usb device we are transferring to for seinu and nuse
+        usb_nuse = os.path.join(self.usb_path, "Nuse Backups")
+        usb_seinu = os.path.join(self.usb_path, "Seinu")
 
+        ## folder for the where the backups folder is
         nusevei_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei")
-        nusevei_backup_destination = os.path.join(os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei"), "Nuse Backups")
 
-        for dir_path, dir_names, file_names in os.walk(self.scf_dir):
-            for file_name in file_names:
-                source_path = os.path.join(dir_path, file_name)
-                destination_sub_dir = dir_path.split(self.scf_dir)[1]
-                destination_path = os.path.join(destination_scf, destination_sub_dir, file_name)
-                if(not os.path.exists(destination_path)):
-                    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-                    shutil.copy(source_path, destination_path)
+        ## backups folder for the sal files
+        nusevei_backup_actual = os.path.join(nusevei_backups, "Nuse Backups")
 
-        for dir_path, dir_names, file_names in os.walk(nusevei_backups):
-            for file_name in file_names:
-                source_path = os.path.join(dir_path, file_name)
-                destination_sub_dir = dir_path.split(nusevei_backups)[1]
-                destination_path = os.path.join(self.usb_path, destination_sub_dir, file_name)
-                if(not os.path.exists(destination_path)):
-                    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-                    shutil.copy(source_path, destination_path)
+        ## main seinu folder
+        seinu_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Seinu")
+        
+        print("Merging SCF Folders")
 
-        shutil.rmtree(self.scf_dir)
-        shutil.rmtree(nusevei_backup_destination)
+        self.merge_directories(self.scf_actual_dir, destination_scf, overwrite=True)
 
-        time.sleep(.1)
+        print("Merging Nuse Folders")
 
-        os.mkdir(nusevei_backup_destination)
+        self.merge_directories(nusevei_backup_actual, usb_nuse, overwrite=True)
+
+        print("Merging Seinu Folder")
+
+        self.merge_directories(seinu_backups, usb_seinu, overwrite=True)
+
+        try:
+            shutil.rmtree(self.scf_dir)
+
+        except:
+            pass
+
+        try:
+            shutil.rmtree(nusevei_backup_actual)
+
+        except:
+            pass
+
+##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    def merge_directories(self, source_directory, destination_directory, overwrite=False) -> None:
+
+        """
+
+        Merge the contents of the source directory into the destination directory.\n
+
+        Parameters:\n
+        source_directory (str): The source directory path.\n
+        destination_directory (str): The destination directory path.\n
+        overwrite (bool): If True, overwrite existing files in the destination directory (default is False).\n
+
+        Returns:\n
+        None.\n
+
+        """
+
+        for item in os.listdir(source_directory):
+            source_item = os.path.join(source_directory, item)
+            destination_item = os.path.join(destination_directory, item)
+
+            if(os.path.isfile(source_item)):
+                if os.path.exists(destination_item) and not overwrite:
+                    continue  # Skip if the file already exists in the destination directory
+                os.makedirs(os.path.dirname(destination_item), exist_ok=True)  # Create parent directories if necessary
+                shutil.copy2(source_item, destination_item)
+                
+            elif(os.path.isdir(source_item)):
+                if(os.path.exists(destination_item) and overwrite):
+                    if(os.path.isdir(destination_item)):
+                        shutil.rmtree(destination_item)  # Remove existing directory
+                    else:
+                        os.remove(destination_item)  # Remove existing file
+                shutil.copytree(source_item, destination_item, copy_function=shutil.copy2)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
