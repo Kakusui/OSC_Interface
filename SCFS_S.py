@@ -225,7 +225,7 @@ class SCFS:
         util.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
         util.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
         util.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
-
+        
 #-------------------Start-of-download_files()-------------------------------------------------
 
     def download_files(self) -> None:
@@ -423,9 +423,9 @@ class SCFS:
         Merge the contents of the source directory into the destination directory.\n
 
         Parameters:\n
-        source_directory (str): The source directory path.\n
-        destination_directory (str): The destination directory path.\n
-        overwrite (bool): If True, overwrite existing files but not directories in the destination directory (default is False).\n
+        source_directory (str) : The source directory path.\n
+        destination_directory (str) : The destination directory path.\n
+        overwrite (bool | optional) : If True, overwrite existing files but not directories in the destination directory (default is False).\n
 
         Returns:\n
         None.\n
@@ -437,14 +437,22 @@ class SCFS:
             destination_item = os.path.join(destination_directory, item)
 
             if(os.path.isfile(source_item)):
-                if os.path.exists(destination_item) and not overwrite:
-                    continue  # Skip if the file already exists in the destination directory
-                os.makedirs(os.path.dirname(destination_item), exist_ok=True)  # Create parent directories if necessary
+
+                if(os.path.exists(destination_item) and not overwrite):
+                    continue  ## Skip if the file already exists in the destination directory
+
+                os.makedirs(os.path.dirname(destination_item), exist_ok=True)  ## Create parent directories if necessary
                 shutil.copy2(source_item, destination_item)
-                
+
             elif(os.path.isdir(source_item)):
-                if(not os.path.exists(destination_item)):
-                    shutil.copytree(source_item, destination_item, copy_function=shutil.copy2)
+
+                if(os.path.exists(destination_item) and not overwrite):
+                    ## Merge the contents of the source directory into the existing destination directory
+                    self.merge_directories(source_item, destination_item, overwrite)
+                else:
+                    ## If destination directory doesn't exist, create it and copy the contents
+                    os.makedirs(destination_item, exist_ok=True)
+                    self.merge_directories(source_item, destination_item, overwrite)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
