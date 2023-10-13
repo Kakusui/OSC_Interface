@@ -140,12 +140,6 @@ class SCFS:
             
             exit()
 
-        # Get the handle of the console window
-        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-
-        # Maximize the console window
-        ctypes.windll.user32.ShowWindow(hwnd, 6)
-
         util.clear_console()
 
         self.setup_scf_folder()
@@ -372,33 +366,36 @@ class SCFS:
 
         """
 
+        with open(r"filenames.txt" , "r+", encoding="utf-8") as file:
+            filenames = file.readlines()
+
         ## destination folder for the scf folder
         destination_scf = os.path.join(self.usb_path, "SCF")
 
-        ## the paths to the usb device we are transferring to for seinu and nuse
-        usb_nuse = os.path.join(self.usb_path, "Nuse Backups")
-        usb_seinu = os.path.join(self.usb_path, "Seinu")
+        ## the paths to the usb device we are transferring to for user and data
+        usb_database = os.path.join(self.usb_path, filenames[0].strip())
+        user_user = os.path.join(self.usb_path, filenames[1].strip() + " Backups")
 
         ## folder for the where the backups folder is
-        nusevei_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Nusevei")
+        database_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
 
-        ## backups folder for the sal files
-        nusevei_backup_actual = os.path.join(nusevei_backups, "Nuse Backups")
+        ## backups folder for the database files
+        database_backup_actual = os.path.join(database_backups, f"{filenames[0].strip()} Backups")
 
-        ## main seinu folder
-        seinu_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),"Seinu")
+        ## main user folder
+        user_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[1].strip())
         
         print("Merging SCF Folders")
 
         self.merge_directories(self.scf_actual_dir, destination_scf, overwrite=True)
 
-        print("Merging Nuse Folders")
+        print(f"Merging {filenames[0].strip()} Folders")
 
-        self.merge_directories(nusevei_backup_actual, usb_nuse, overwrite=True)
+        self.merge_directories(database_backup_actual, usb_database, overwrite=True)
 
-        print("Merging Seinu Folder")
+        print(f"Merging {filenames[1].strip()} Folders")
 
-        self.merge_directories(seinu_backups, usb_seinu, overwrite=True)
+        self.merge_directories(user_backups, user_user, overwrite=True)
 
         try:
             shutil.rmtree(self.scf_dir)
@@ -407,8 +404,8 @@ class SCFS:
             pass
 
         try:
-            shutil.rmtree(nusevei_backup_actual)
-            os.mkdir(nusevei_backup_actual)
+            shutil.rmtree(database_backup_actual)
+            os.mkdir(database_backup_actual)
 
         except:
             pass
