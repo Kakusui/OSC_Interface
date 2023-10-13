@@ -1,3 +1,3 @@
 **SCFS**
 ------------------------------------------
-DO NOT USE THIS.
+Not intended for usage other than Bikatr7.
