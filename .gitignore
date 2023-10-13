@@ -1,0 +1,6 @@
+.gitattributes
+folder_ids.txt
+modules/__pycache__/
+SCF/
+.vscode/settings.json
+filenames.txt
