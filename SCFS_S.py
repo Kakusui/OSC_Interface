@@ -1,10 +1,9 @@
-## built-in modules
+## built-in libraries
 import datetime
 import os
-import ctypes
 import shutil
 
-## third party modules
+## third party libraries
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from apiclient import discovery
@@ -171,8 +170,8 @@ class SCFS:
 
         """
         
-        self.scf_dir = os.path.join(self.script_dir, "SCF")
-        self.scf_actual_dir = os.path.join(self.scf_dir, "SCF")
+        self.scf_host_dir = os.path.join(self.script_dir, "SCF")
+        self.scf_actual_dir = os.path.join(self.scf_host_dir, "SCF")
 
         self.tafunuha_dir = os.path.join(self.scf_actual_dir, "tafunuha")
         self.rahahinukawa_dir = os.path.join(self.scf_actual_dir, "rahahinukawa")
@@ -195,7 +194,7 @@ class SCFS:
         self.MehademaRakasuniKasunu_iteration_path = os.path.join(self.MehademaRakasuniKasunu_iteration_dir, "iteration.txt")
         self.TaninMehademaRakasuni_iteration_path = os.path.join(self.TaninMehademaRakasuni_iteration_dir, "iteration.txt")
 
-        util.standard_create_directory(self.scf_dir)
+        util.standard_create_directory(self.scf_host_dir)
 
         util.standard_create_directory(self.scf_actual_dir)
 
@@ -373,17 +372,17 @@ class SCFS:
         destination_scf = os.path.join(self.usb_path, "SCF")
 
         ## the paths to the usb device we are transferring to for user and data
-        usb_database = os.path.join(self.usb_path, filenames[0].strip())
-        user_user = os.path.join(self.usb_path, filenames[1].strip() + " Backups")
+        destination_database_backups = os.path.join(self.usb_path, filenames[0].strip() + " Backups")
+        destination_user_dir = os.path.join(self.usb_path, filenames[1].strip())
 
         ## folder for the where the backups folder is
-        database_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
+        src_database_backups_dir = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
 
         ## backups folder for the database files
-        database_backup_actual = os.path.join(database_backups, f"{filenames[0].strip()} Backups")
+        database_backup_actual = os.path.join(src_database_backups_dir, f"{filenames[0].strip()} Backups")
 
         ## main user folder
-        user_backups = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[1].strip())
+        desktop_user_directory = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"), filenames[1].strip())
         
         print("Merging SCF Folders")
 
@@ -391,14 +390,21 @@ class SCFS:
 
         print(f"Merging {filenames[0].strip()} Folders")
 
-        self.merge_directories(database_backup_actual, usb_database, overwrite=True)
+        self.merge_directories(database_backup_actual, destination_database_backups, overwrite=True)
 
         print(f"Merging {filenames[1].strip()} Folders")
 
-        self.merge_directories(user_backups, user_user, overwrite=True)
+        try:
+            shutil.rmtree(destination_user_dir)
+            os.mkdir(destination_user_dir)
+
+        except:
+            pass
+
+        self.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True)
 
         try:
-            shutil.rmtree(self.scf_dir)
+            shutil.rmtree(self.scf_host_dir)
 
         except:
             pass
