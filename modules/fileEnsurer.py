@@ -86,6 +86,7 @@ class fileEnsurer:
 
       self.create_needed_base_directories()
       self.ensure_local_config_files()
+      self.ensure_interface_files()
 
 ##--------------------start-of-create_needed_base_directories()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -122,7 +123,9 @@ class fileEnsurer:
       
       """
 
-      util.standard_create_file(self.folder_id_path)
+      self.folder_ids_path = os.path.join(self.local_config_dir, "folder_ids.txt")
+
+      self.file_handler.standard_create_file(self.folder_ids_path)
 
 ##--------------------start-of-ensure_interface_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -140,6 +143,8 @@ class fileEnsurer:
 
       """
 
-      util.standard_create_file(self.client_json_path)
+      self.client_json_path = os.path.join(self.interface_dir, "client_secrets.json")
+      self.last_run_path = os.path.join(self.interface_dir, "last_run.txt")
 
-      util.modified_create_file(self.last_run_path, "")
+      self.file_handler.standard_create_file(self.client_json_path)
+      self.file_handler.standard_create_file(self.last_run_path)
