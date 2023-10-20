@@ -1,5 +1,9 @@
 ## built-in libaries
 import os
+import typing
+
+## custom modules
+from modules.fileEnsurer import fileEnsurer
 
 class pathHandler:
 
@@ -11,30 +15,63 @@ class pathHandler:
 
 ##--------------------start-of-__init__()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self):
-        # Sample value for scf_actual_dir for demonstration purposes
-        self.scf_actual_dir = "/some/path"
+    def __init__(self, inc_file_ensurer:fileEnsurer) -> None:
 
-        # Let's say names_from_file is a list of names read from your file
-        names_from_file = self._read_names_from_file()
+        """
+        
+        Initializes the pathHandler class.\n
 
-        self.dirs = {}
-        self.iteration_dirs = {}
-        self.iteration_paths = {}
+        Parameters:\n
+        file_ensurer (object - fileEnsurer): The fileEnsurer object.\n
 
-        for name in names_from_file:
-            # Construct directories dynamically
-            self.dirs[name] = os.path.join(self.scf_actual_dir, name)
+        Returns:\n
+        None.\n
+
+        """
+
+        self.file_ensurer = inc_file_ensurer
+
+        ##----------------------------------------------------------------/
+
+        self.ids, self.names = self.get_folder_properties()
+
+        self.dirs:dict[str,str] = {}
+        self.iteration_dirs:dict[str,str] = {}
+        self.iteration_paths:dict[str,str] = {}
+
+        for name in self.names:
+            self.dirs[name] = os.path.join(self.file_ensurer.scf_actual_dir, name)
             self.iteration_dirs[name] = os.path.join(self.dirs[name], "Current Iteration")
             self.iteration_paths[name] = os.path.join(self.iteration_dirs[name], "iteration.txt")
 
-    def _read_names_from_file(self):
-        # Here, read your file and return the list of names.
-        # This is just a mock implementation.
-        return ["tafunuha", "rahahinukawa", "NuharunuNihamemekayahame", "NisoMehademaRakasuni", "MehademaRakasuniKasunu", "TaninMehademaRakasuni"]
+##--------------------start-of-get_folder_properties()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Usage
-obj = YourClass()
-print(obj.dirs)
-print(obj.iteration_dirs)
-print(obj.iteration_paths)
+    def get_folder_properties(self) -> typing.Tuple[typing.List[str], typing.List[str]]:
+
+        """
+
+        Gets the folder properties from the local config files.\n
+
+        Parameters:\n
+        self (object - pathHandler): The pathHandler object.\n
+
+        Returns:\n
+        folder_ids (list - str): The folder ids.\n
+        folder_names (list - str): The folder names.\n
+        
+        """
+
+        with open(self.file_ensurer.folder_ids_path, "r") as file:
+            folder_ids = file.readlines()
+
+        with open(self.file_ensurer.folder_names_path, "r") as file:
+            folder_names = file.readlines()
+
+
+        return folder_ids, folder_names
+        
+
+        
+
+        
+

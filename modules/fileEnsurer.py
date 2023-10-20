@@ -123,7 +123,17 @@ class fileEnsurer:
       
       """
 
+      ##----------------------------------------------------------------dirs----------------------------------------------------------------
+
+      self.scf_host_dir = os.path.join(self.script_dir, "SCF")
+      self.scf_actual_dir = os.path.join(self.scf_host_dir, "SCF")
+
+      ##----------------------------------------------------------------paths----------------------------------------------------------------
+
       self.folder_ids_path = os.path.join(self.local_config_dir, "folder_ids.txt")
+      self.folder_names_path = os.path.join(self.local_config_dir, "folder_names.txt")
+
+      self.file_names_path = os.path.join(self.local_config_dir, "file_names.txt")
 
       self.file_handler.standard_create_file(self.folder_ids_path)
 
