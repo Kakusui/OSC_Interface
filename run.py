@@ -9,13 +9,14 @@ from pydrive.drive import GoogleDrive
 from apiclient import discovery
 
 ## custom modules
+from modules.fileEnsurer import fileEnsurer
+from modules.toolkit import toolkit
 
-
-class OSC:
+class Interface:
 
     """
 
-    Used for interacting with the OSC.\n
+    Used for interfacing with the OSC.\n
 
     """
 
@@ -25,7 +26,7 @@ class OSC:
 
         """
         
-        Initializes the SCFS class.\n
+        Initializes the Interface class.\n
 
         Parameters:\n
         None.\n
@@ -34,6 +35,12 @@ class OSC:
         None.\n
 
         """
+
+        ##--------------------------------------------------------------objects----------------------------------------------------------------
+
+        self.file_ensurer = fileEnsurer()
+
+        self.toolkit = toolkit(self.file_ensurer.logger)
 
         ##----------------------------------------------------------------variables----------------------------------------------------------------
 
@@ -41,28 +48,22 @@ class OSC:
 
         #----------------------------------------------------------------run----------------------------------------------------------------
 
-        os.system("title " + "OCS Interace")
+        os.system("title " + "OSC Interface")
 
-        util.standard_create_directory(self.config_dir)
+        self.file_ensurer.ensure_files()
 
-        util.standard_create_file(self.client_json_path)
+        self.start_interaction()
 
-        util.standard_create_file(self.folder_id_path)
+##-------------------start-of-start_interaction()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        util.modified_create_file(self.last_run_path, "")
-
-        self.start_SCFS()
-
-##-------------------start-of-start_SCFS()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    def start_SCFS(self) -> None:
+    def start_interaction(self) -> None:
 
         """
         
-        Start the SCFS process.\n
+        Start the interaction with OSC.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -70,18 +71,18 @@ class OSC:
         """
 
         ## if usb that we are transferring to does not exist than exit
-        if(not os.path.exists(self.usb_path)):
-            print("E:\\ Does not exist\n\n")
+        if(not os.path.exists(self.file_ensurer.usb_path)):
+            print("E:\\ Does not exist\n")
 
-            util.pause_console()
+            self.toolkit.pause_console()
             exit()
 
         ## no need to run multiple times a day
-        with open(self.last_run_path, "r+") as f:
+        with open(self.file_ensurer.last_run_path, "r+") as f:
             if(f.read() == datetime.datetime.now().strftime("%m/%d/%Y")):
                 print("Already ran today\n")
 
-                util.pause_console()
+                self.toolkit.pause_console()
                 exit()
 
         self.transfer()
@@ -95,7 +96,7 @@ class OSC:
         Begins the transfer process.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -142,7 +143,7 @@ class OSC:
         Setups the scf folder.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -207,7 +208,7 @@ class OSC:
         Downloads all files in a google drive folder.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -250,7 +251,7 @@ class OSC:
         Deletes all files that have been marked for deletion.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -287,7 +288,7 @@ class OSC:
         Gets a new file path for a downloaded file.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -337,7 +338,7 @@ class OSC:
         Transfers all downloaded files to the designated usb.\n
 
         Parameters:\n
-        self (object - SCFS) : the SCFS object.\n
+        self (object - Interface) : the Interface object.\n
 
         Returns:\n
         None.\n
@@ -438,4 +439,4 @@ class OSC:
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-SCFS()
+Interface()

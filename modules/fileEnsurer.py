@@ -48,7 +48,7 @@ class fileEnsurer:
 
       ##----------------------------------------------------------------paths----------------------------------------------------------------
 
-      ## log file
+      self.usb_path = "E:\\"
 
       self.log_path = os.path.join(self.local_config_dir, "log.txt")
 
@@ -70,7 +70,7 @@ class fileEnsurer:
 
 ##--------------------start-of-ensure_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-   async def ensure_files(self) -> None:
+   def ensure_files(self) -> None:
 
       """
 
@@ -147,4 +147,4 @@ class fileEnsurer:
       self.last_run_path = os.path.join(self.interface_dir, "last_run.txt")
 
       self.file_handler.standard_create_file(self.client_json_path)
-      self.file_handler.standard_create_file(self.last_run_path)
+      self.file_handler.modified_create_file(self.last_run_path, "L")
