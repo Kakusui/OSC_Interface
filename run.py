@@ -3,10 +3,12 @@ import datetime
 import os
 import shutil
 
+
 ## third party libraries
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from apiclient import discovery
+from googleapiclient.http import BatchHttpRequest
 
 ## custom modules
 from modules.fileEnsurer import fileEnsurer
@@ -76,7 +78,7 @@ class Interface:
 
         ## if usb that we are transferring to does not exist than exit
         if(not os.path.exists(self.file_ensurer.usb_path)):
-            print("E:\\ Does not exist\n")
+            print(self.file_ensurer.usb_path + " Does not exist\n")
 
             self.toolkit.pause_console()
             exit()
@@ -163,7 +165,7 @@ class Interface:
         for path in self.path_handler.iteration_paths.values():
             self.file_ensurer.file_handler.modified_create_file(path, "1")
         
-#-------------------Start-of-download_files()-------------------------------------------------
+##-------------------Start-of-download_files()-------------------------------------------------
 
     def download_files(self) -> None:
 
@@ -188,22 +190,17 @@ class Interface:
             query = "mimeType != 'application/vnd.google-apps.folder' and trashed = false and '{}' in parents".format(id)
             fileList = self.drive.ListFile({'q': query}).GetList()
 
-            for f in fileList:
-                self.marked_for_deletion.append(f['id'])
+            for drive_file in fileList:
+                self.marked_for_deletion.append(drive_file['id'])
 
-                ff = self.drive.CreateFile({'id': f['id']})
+                downloaded_file = self.drive.CreateFile({'id': drive_file['id']})
 
                 file_path = self.get_file_path(i + 1)
 
-                print("Downloading {} as {}".format(f['title'], file_path))
-                ff.GetContentFile(file_path + "." + f['fileExtension'])
+                print("Downloading {} as {}".format(downloaded_file['title'], file_path))
+                downloaded_file.GetContentFile(file_path + "." + drive_file['fileExtension'])
 
-                file_path = ""
-                f = None
-                ff = None
-
-
-#-------------------Start-of-delete_files()-------------------------------------------------
+##-------------------Start-of-delete_files()-------------------------------------------------
 
     def delete_files(self) -> None:
 
@@ -222,7 +219,7 @@ class Interface:
         i = 0
 
         service = discovery.build('drive', 'v3', credentials=self.gauth.credentials)
-        batch = service.new_batch_http_request(callback=None)
+        batch:BatchHttpRequest = service.new_batch_http_request()
 
         for id in self.marked_for_deletion:
 
@@ -289,7 +286,7 @@ class Interface:
 
         """
 
-        with open(r"filenames.txt" , "r+", encoding="utf-8") as file:
+        with open(self.file_ensurer.file_names_path , "r+", encoding="utf-8") as file:
             filenames = file.readlines()
 
         ## destination folder for the scf folder
