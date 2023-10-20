@@ -1,7 +1,7 @@
 ## built-in libraries
 import datetime
 import os
-import shutil
+import shself.toolkit
 
 ## third party libraries
 from pydrive.auth import GoogleAuth
@@ -104,22 +104,22 @@ class Interface:
         """
 
         try:
-            GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = self.client_json_path
+            GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = self.file_ensurer.client_json_path
             
             self.gauth = GoogleAuth()
             self.gauth.LocalWebserverAuth()
             self.drive = GoogleDrive(self.gauth)
 
         except Exception as e:
-            util.clear_console()
+            self.toolkit.clear_console()
 
             print("Cloud Authentication Failed Due to : " + str(e))
             
-            util.pause_console()
+            self.toolkit.pause_console()
             
             exit()
 
-        util.clear_console()
+        self.toolkit.clear_console()
 
         self.setup_scf_folder()
 
@@ -131,7 +131,7 @@ class Interface:
 
         currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
 
-        with open(self.last_run_path, "w+", encoding="utf-8") as file:
+        with open(self.file_ensurer.last_run_path, "w+", encoding="utf-8") as file:
             file.write(currentDate)
 
 ##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ class Interface:
 
         """
         
-        self.scf_host_dir = os.path.join(self.script_dir, "SCF")
+        self.scf_host_dir = os.path.join(self.file_ensurer.script_dir, "SCF")
         self.scf_actual_dir = os.path.join(self.scf_host_dir, "SCF")
 
         self.tafunuha_dir = os.path.join(self.scf_actual_dir, "tafunuha")
@@ -174,30 +174,30 @@ class Interface:
         self.MehademaRakasuniKasunu_iteration_path = os.path.join(self.MehademaRakasuniKasunu_iteration_dir, "iteration.txt")
         self.TaninMehademaRakasuni_iteration_path = os.path.join(self.TaninMehademaRakasuni_iteration_dir, "iteration.txt")
 
-        util.standard_create_directory(self.scf_host_dir)
+        self.toolkit.standard_create_directory(self.scf_host_dir)
 
-        util.standard_create_directory(self.scf_actual_dir)
+        self.toolkit.standard_create_directory(self.scf_actual_dir)
 
-        util.standard_create_directory(self.tafunuha_dir)
-        util.standard_create_directory(self.rahahinukawa_dir)
-        util.standard_create_directory(self.NuharunuNihamemekayahame_dir)
-        util.standard_create_directory(self.NisoMehademaRakasuni_dir)
-        util.standard_create_directory(self.MehademaRakasuniKasunu_dir)
-        util.standard_create_directory(self.TaninMehademaRakasuni_dir)
+        self.toolkit.standard_create_directory(self.tafunuha_dir)
+        self.toolkit.standard_create_directory(self.rahahinukawa_dir)
+        self.toolkit.standard_create_directory(self.NuharunuNihamemekayahame_dir)
+        self.toolkit.standard_create_directory(self.NisoMehademaRakasuni_dir)
+        self.toolkit.standard_create_directory(self.MehademaRakasuniKasunu_dir)
+        self.toolkit.standard_create_directory(self.TaninMehademaRakasuni_dir)
 
-        util.standard_create_directory(self.tafunuha_iteration_dir)
-        util.standard_create_directory(self.rahahinukawa_iteration_dir)
-        util.standard_create_directory(self.NuharunuNihamemekayahame_iteration_dir)
-        util.standard_create_directory(self.NisoMehademaRakasuni_iteration_dir)
-        util.standard_create_directory(self.MehademaRakasuniKasunu_iteration_dir)
-        util.standard_create_directory(self.TaninMehademaRakasuni_iteration_dir)
+        self.toolkit.standard_create_directory(self.tafunuha_iteration_dir)
+        self.toolkit.standard_create_directory(self.rahahinukawa_iteration_dir)
+        self.toolkit.standard_create_directory(self.NuharunuNihamemekayahame_iteration_dir)
+        self.toolkit.standard_create_directory(self.NisoMehademaRakasuni_iteration_dir)
+        self.toolkit.standard_create_directory(self.MehademaRakasuniKasunu_iteration_dir)
+        self.toolkit.standard_create_directory(self.TaninMehademaRakasuni_iteration_dir)
 
-        util.modified_create_file(self.tafunuha_iteration_path, "1")
-        util.modified_create_file(self.rahahinukawa_iteration_path, "1")
-        util.modified_create_file(self.NuharunuNihamemekayahame_iteration_path, "1")
-        util.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
-        util.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
-        util.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
+        self.toolkit.modified_create_file(self.tafunuha_iteration_path, "1")
+        self.toolkit.modified_create_file(self.rahahinukawa_iteration_path, "1")
+        self.toolkit.modified_create_file(self.NuharunuNihamemekayahame_iteration_path, "1")
+        self.toolkit.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
+        self.toolkit.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
+        self.toolkit.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
         
 #-------------------Start-of-download_files()-------------------------------------------------
 
@@ -375,7 +375,7 @@ class Interface:
         print(f"Merging {filenames[1].strip()} Folders")
 
         try:
-            shutil.rmtree(destination_user_dir)
+            shself.toolkit.rmtree(destination_user_dir)
             os.mkdir(destination_user_dir)
 
         except:
@@ -384,13 +384,13 @@ class Interface:
         self.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True)
 
         try:
-            shutil.rmtree(self.scf_host_dir)
+            shself.toolkit.rmtree(self.scf_host_dir)
 
         except:
             pass
 
         try:
-            shutil.rmtree(database_backup_actual)
+            shself.toolkit.rmtree(database_backup_actual)
             os.mkdir(database_backup_actual)
 
         except:
@@ -425,7 +425,7 @@ class Interface:
                     continue  ## Skip if the file already exists in the destination directory
 
                 os.makedirs(os.path.dirname(destination_item), exist_ok=True)  ## Create parent directories if necessary
-                shutil.copy2(source_item, destination_item)
+                shself.toolkit.copy2(source_item, destination_item)
 
             elif(os.path.isdir(source_item)):
 

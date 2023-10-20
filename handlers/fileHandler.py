@@ -1,6 +1,5 @@
 ## built-in libaries
 import os
-import traceback
 
 ## custom modules
 from modules.logger import logger
