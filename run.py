@@ -35,33 +35,13 @@ class OSC:
 
         """
 
-
-        ##----------------------------------------------------------------dirs----------------------------------------------------------------
-
-        ## the folder where all the config files are located
-        self.config_dir = os.path.join(os.environ['USERPROFILE'],"SCFSconfig")
-
-        ## path to the directory where the script is located
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
-
-        ##----------------------------------------------------------------paths----------------------------------------------------------------
-
-        self.last_run_path = os.path.join(self.config_dir, "last_run.txt")
-
-        self.client_json_path = os.path.join(self.config_dir, "client_secrets.json")
-
-        self.folder_id_path = os.path.join(self.script_dir, "folder_ids.txt")
-
         ##----------------------------------------------------------------variables----------------------------------------------------------------
 
         self.marked_for_deletion = []
 
-        ## the path to the usb device we are transferring to
-        self.usb_path = "E:\\"
-
         #----------------------------------------------------------------run----------------------------------------------------------------
 
-        os.system("title " + "SCFS")
+        os.system("title " + "OCS Interace")
 
         util.standard_create_directory(self.config_dir)
 

@@ -44,12 +44,13 @@ class fileEnsurer:
          self.config_dir = os.path.join(os.path.expanduser("~"), "OSCInterfaceConfig")
 
       self.local_config_dir = os.path.join(self.script_dir, "LocalConfig")
+      self.interface_dir = os.path.join(self.config_dir, "Interface")
 
       ##----------------------------------------------------------------paths----------------------------------------------------------------
 
       ## log file
 
-      self.log_path = os.path.join(self.config_dir, "log.txt")
+      self.log_path = os.path.join(self.local_config_dir, "log.txt")
 
       ##----------------------------------------------------------------functions----------------------------------------------------------------
 
@@ -84,6 +85,7 @@ class fileEnsurer:
       """
 
       self.create_needed_base_directories()
+      self.ensure_local_config_files()
 
 ##--------------------start-of-create_needed_base_directories()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -102,6 +104,7 @@ class fileEnsurer:
       """
 
       self.file_handler.standard_create_directory(self.local_config_dir)
+      self.file_handler.standard_create_directory(self.interface_dir)
 
 ##--------------------start-of-ensure_local_config_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -119,4 +122,24 @@ class fileEnsurer:
       
       """
 
-  
+      util.standard_create_file(self.folder_id_path)
+
+##--------------------start-of-ensure_interface_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   def ensure_interface_files(self) -> None:
+
+      """
+
+      Ensures that the interface files are present and ready to be used.\n
+
+      Parameters:\n
+      self (object - fileEnsurer) : the fileEnsurer object.\n
+
+      Returns:\n
+      None.\n
+
+      """
+
+      util.standard_create_file(self.client_json_path)
+
+      util.modified_create_file(self.last_run_path, "")
