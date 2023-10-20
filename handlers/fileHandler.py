@@ -14,7 +14,7 @@ class fileHandler():
     """
 ##--------------------start-of-__init__()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self) -> None:
+    def __init__(self, inc_logger:logger) -> None:
 
         """
         
@@ -28,18 +28,7 @@ class fileHandler():
 
         """
 
-        self.script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.output_dir = os.path.join(self.script_dir, "KudasaiOutput")
-
-        if(os.name == 'nt'):  # Windows
-            self.config_dir = os.path.join(os.environ['USERPROFILE'],"KudasaiConfig")
-        else:  # Linux
-            self.config_dir = os.path.join(os.path.expanduser("~"), "KudasaiConfig")
-
-        ## log file
-        self.log_path = os.path.join(self.output_dir, "debug log.txt")
-
-        self.logger = logger(self.log_path)
+        self.logger = inc_logger
 
 ##--------------------start-of-standard_create_directory()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -132,32 +121,3 @@ class fileHandler():
             content_to_write = "omitted"
         
         self.logger.log_action(file_path + " was overwritten with the following content: " + content_to_write)
-
-##-------------------start-of-handle_critical_exception()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    def handle_critical_exception(self, critical_exception:Exception) -> None:
-
-        """
-
-        Handles a critical exception by logging it and then throwing it.\n
-
-        Parameters:\n
-        self (object - fileHandler) : the fileHandler object.\n
-        critical_exception (object - Exception) : the exception to be handled.\n
-
-        Returns:\n
-        None.\n
-
-        """
-
-        ## if crash, catch and log, then throw
-        self.logger.log_action("--------------------------------------------------------------")
-        self.logger.log_action("Kudasai has crashed")
-
-        traceback_str = traceback.format_exc()
-        
-        self.logger.log_action(traceback_str)
-
-        self.logger.push_batch()
-
-        raise critical_exception
