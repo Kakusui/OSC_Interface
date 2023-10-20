@@ -4,5 +4,8 @@
 
 ## folders
 modules/__pycache__/
+handlers/__pycache__/
+
 SCF/
 LocalConfig/
+

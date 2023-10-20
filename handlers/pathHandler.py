@@ -33,11 +33,27 @@ class pathHandler:
 
         ##----------------------------------------------------------------/
 
+##--------------------start-of-setup()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    def setup(self) -> None:
+
+        """
+
+        Sets up the pathHandler object.\n
+
+        Parameters:\n
+        self (object - pathHandler): The pathHandler object.\n
+
+        Returns:\n
+        None.\n
+
+        """
+
         self.ids, self.names = self.get_folder_properties()
 
-        self.dirs:dict[int,str] = {}
-        self.iteration_dirs:dict[int,str] = {}
-        self.iteration_paths:dict[int,str] = {}
+        self.dirs:typing.Dict[int,str] = {}
+        self.iteration_dirs:typing.Dict[int,str] = {}
+        self.iteration_paths:typing.Dict[int,str] = {}
 
         for i, name in enumerate(self.names):
             self.dirs[i+1] = os.path.join(self.file_ensurer.scf_actual_dir, name)
@@ -62,10 +78,10 @@ class pathHandler:
         """
 
         with open(self.file_ensurer.folder_ids_path, "r") as file:
-            folder_ids = file.readlines()
+            folder_ids = [line.strip() for line in file.readlines()]
 
         with open(self.file_ensurer.folder_names_path, "r") as file:
-            folder_names = file.readlines()
+            folder_names = [line.strip() for line in file.readlines()]
 
 
         return folder_ids, folder_names

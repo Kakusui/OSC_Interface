@@ -58,6 +58,8 @@ class Interface:
 
         self.file_ensurer.ensure_files()
 
+        self.path_handler.setup()
+
         self.start_interaction()
 
 ##-------------------start-of-start_interaction()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -155,6 +157,9 @@ class Interface:
         None.\n
 
         """
+
+        self.file_ensurer.file_handler.standard_create_directory(self.file_ensurer.scf_host_dir)
+        self.file_ensurer.file_handler.standard_create_directory(self.file_ensurer.scf_actual_dir)
         
         for path in self.path_handler.dirs.values():
             self.file_ensurer.file_handler.standard_create_directory(path)
