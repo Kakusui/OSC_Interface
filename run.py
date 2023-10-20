@@ -1,7 +1,7 @@
 ## built-in libraries
 import datetime
 import os
-import shself.toolkit
+import shutil
 
 ## third party libraries
 from pydrive.auth import GoogleAuth
@@ -11,6 +11,8 @@ from apiclient import discovery
 ## custom modules
 from modules.fileEnsurer import fileEnsurer
 from modules.toolkit import toolkit
+
+from handlers.pathHandler import pathHandler
 
 class Interface:
 
@@ -41,6 +43,8 @@ class Interface:
         self.file_ensurer = fileEnsurer()
 
         self.toolkit = toolkit(self.file_ensurer.logger)
+
+        self.path_handler = pathHandler(self.file_ensurer)
 
         ##----------------------------------------------------------------variables----------------------------------------------------------------
 
@@ -150,54 +154,14 @@ class Interface:
 
         """
         
-        self.scf_host_dir = os.path.join(self.file_ensurer.script_dir, "SCF")
-        self.scf_actual_dir = os.path.join(self.scf_host_dir, "SCF")
+        for path in self.path_handler.dirs.values():
+            self.file_ensurer.file_handler.standard_create_directory(path)
 
-        self.tafunuha_dir = os.path.join(self.scf_actual_dir, "tafunuha")
-        self.rahahinukawa_dir = os.path.join(self.scf_actual_dir, "rahahinukawa")
-        self.NuharunuNihamemekayahame_dir = os.path.join(self.scf_actual_dir, "NuharunuNihamemekayahame")
-        self.NisoMehademaRakasuni_dir = os.path.join(self.scf_actual_dir, "NisoMehademaRakasuni")
-        self.MehademaRakasuniKasunu_dir = os.path.join(self.scf_actual_dir, "MehademaRakasuniKasunu")
-        self.TaninMehademaRakasuni_dir = os.path.join(self.scf_actual_dir, "TaninMehademaRakasuni")
+        for path in self.path_handler.iteration_dirs.values():
+            self.file_ensurer.file_handler.standard_create_directory(path)
 
-        self.tafunuha_iteration_dir = os.path.join(self.tafunuha_dir, "Current Iteration")
-        self.rahahinukawa_iteration_dir = os.path.join(self.rahahinukawa_dir, "Current Iteration")
-        self.NuharunuNihamemekayahame_iteration_dir = os.path.join(self.NuharunuNihamemekayahame_dir, "Current Iteration")
-        self.NisoMehademaRakasuni_iteration_dir = os.path.join(self.NisoMehademaRakasuni_dir, "Current Iteration")
-        self.MehademaRakasuniKasunu_iteration_dir = os.path.join(self.MehademaRakasuniKasunu_dir, "Current Iteration")
-        self.TaninMehademaRakasuni_iteration_dir = os.path.join(self.TaninMehademaRakasuni_dir, "Current Iteration")
-
-        self.tafunuha_iteration_path = os.path.join(self.tafunuha_iteration_dir, "iteration.txt")
-        self.rahahinukawa_iteration_path = os.path.join(self.rahahinukawa_iteration_dir, "iteration.txt")
-        self.NuharunuNihamemekayahame_iteration_path = os.path.join(self.NuharunuNihamemekayahame_iteration_dir, "iteration.txt")
-        self.NisoMehademaRakasuni_iteration_path = os.path.join(self.NisoMehademaRakasuni_iteration_dir, "iteration.txt")
-        self.MehademaRakasuniKasunu_iteration_path = os.path.join(self.MehademaRakasuniKasunu_iteration_dir, "iteration.txt")
-        self.TaninMehademaRakasuni_iteration_path = os.path.join(self.TaninMehademaRakasuni_iteration_dir, "iteration.txt")
-
-        self.toolkit.standard_create_directory(self.scf_host_dir)
-
-        self.toolkit.standard_create_directory(self.scf_actual_dir)
-
-        self.toolkit.standard_create_directory(self.tafunuha_dir)
-        self.toolkit.standard_create_directory(self.rahahinukawa_dir)
-        self.toolkit.standard_create_directory(self.NuharunuNihamemekayahame_dir)
-        self.toolkit.standard_create_directory(self.NisoMehademaRakasuni_dir)
-        self.toolkit.standard_create_directory(self.MehademaRakasuniKasunu_dir)
-        self.toolkit.standard_create_directory(self.TaninMehademaRakasuni_dir)
-
-        self.toolkit.standard_create_directory(self.tafunuha_iteration_dir)
-        self.toolkit.standard_create_directory(self.rahahinukawa_iteration_dir)
-        self.toolkit.standard_create_directory(self.NuharunuNihamemekayahame_iteration_dir)
-        self.toolkit.standard_create_directory(self.NisoMehademaRakasuni_iteration_dir)
-        self.toolkit.standard_create_directory(self.MehademaRakasuniKasunu_iteration_dir)
-        self.toolkit.standard_create_directory(self.TaninMehademaRakasuni_iteration_dir)
-
-        self.toolkit.modified_create_file(self.tafunuha_iteration_path, "1")
-        self.toolkit.modified_create_file(self.rahahinukawa_iteration_path, "1")
-        self.toolkit.modified_create_file(self.NuharunuNihamemekayahame_iteration_path, "1")
-        self.toolkit.modified_create_file(self.NisoMehademaRakasuni_iteration_path, "1")
-        self.toolkit.modified_create_file(self.MehademaRakasuniKasunu_iteration_path, "1")
-        self.toolkit.modified_create_file(self.TaninMehademaRakasuni_iteration_path, "1")
+        for path in self.path_handler.iteration_paths.values():
+            self.file_ensurer.file_handler.modified_create_file(path, "1")
         
 #-------------------Start-of-download_files()-------------------------------------------------
 
@@ -214,11 +178,8 @@ class Interface:
         None.\n
 
         """
-        
-        with open(self.folder_id_path, "r+", encoding="utf-8") as file:
-            gfolder_ids = file.readlines()
 
-        for i, id in enumerate(gfolder_ids):
+        for i, id in enumerate(self.path_handler.ids):
 
             if(i >= 6):
                 break
@@ -281,7 +242,7 @@ class Interface:
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
-    def get_file_path(self, file_type) -> str:
+    def get_file_path(self, file_type:int) -> str:
 
         """
         
@@ -296,36 +257,19 @@ class Interface:
         """ 
         
         directory = datetime.datetime.today().strftime('%Y-%m-%d')
-
-        filePaths = {
-            1: self.NisoMehademaRakasuni_dir,
-            2: self.MehademaRakasuniKasunu_dir,
-            3: self.NuharunuNihamemekayahame_dir,
-            4: self.rahahinukawa_dir,
-            5: self.tafunuha_dir,
-            6: self.TaninMehademaRakasuni_dir
-        }
-        iterationPaths = {
-            1: self.NisoMehademaRakasuni_iteration_path,
-            2: self.MehademaRakasuniKasunu_iteration_path,
-            3: self.NuharunuNihamemekayahame_iteration_path,
-            4: self.rahahinukawa_iteration_path,
-            5: self.tafunuha_iteration_path,
-            6: self.TaninMehademaRakasuni_iteration_path
-        }
         
-        path = os.path.join(filePaths[file_type], directory)
+        path = os.path.join(self.path_handler.dirs[file_type], directory)
 
-        with open(iterationPaths[file_type], "r", encoding="utf8") as f:
-            Iteration = int(f.read())
+        with open(self.path_handler.iteration_paths[file_type], "r", encoding="utf8") as f:
+            iteration = int(f.read())
 
         os.makedirs(path, exist_ok=True)
         
-        file_path = path + "/" + directory + "-" + str(Iteration)
-        Iteration += 1
+        file_path = path + "/" + directory + "-" + str(iteration)
+        iteration += 1
 
-        with open(iterationPaths[file_type], "w", encoding="utf8") as f:
-            f.write(str(Iteration))
+        with open(self.path_handler.iteration_paths[file_type], "w", encoding="utf8") as f:
+            f.write(str(iteration))
 
         return file_path
 
@@ -349,11 +293,11 @@ class Interface:
             filenames = file.readlines()
 
         ## destination folder for the scf folder
-        destination_scf = os.path.join(self.usb_path, "SCF")
+        destination_scf = os.path.join(self.file_ensurer.usb_path, "SCF")
 
         ## the paths to the usb device we are transferring to for user and data
-        destination_database_backups = os.path.join(self.usb_path, filenames[0].strip() + " Backups")
-        destination_user_dir = os.path.join(self.usb_path, filenames[1].strip())
+        destination_database_backups = os.path.join(self.file_ensurer.usb_path, filenames[0].strip() + " Backups")
+        destination_user_dir = os.path.join(self.file_ensurer.usb_path, filenames[1].strip())
 
         ## folder for the where the backups folder is
         src_database_backups_dir = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
@@ -366,7 +310,7 @@ class Interface:
         
         print("Merging SCF Folders")
 
-        self.merge_directories(self.scf_actual_dir, destination_scf, overwrite=True)
+        self.merge_directories(self.file_ensurer.scf_actual_dir, destination_scf, overwrite=True)
 
         print(f"Merging {filenames[0].strip()} Folders")
 
@@ -375,7 +319,7 @@ class Interface:
         print(f"Merging {filenames[1].strip()} Folders")
 
         try:
-            shself.toolkit.rmtree(destination_user_dir)
+            shutil.rmtree(destination_user_dir)
             os.mkdir(destination_user_dir)
 
         except:
@@ -384,19 +328,18 @@ class Interface:
         self.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True)
 
         try:
-            shself.toolkit.rmtree(self.scf_host_dir)
+            shutil.rmtree(self.file_ensurer.scf_host_dir)
 
         except:
             pass
 
         try:
-            shself.toolkit.rmtree(database_backup_actual)
+            shutil.rmtree(database_backup_actual)
             os.mkdir(database_backup_actual)
 
         except:
             pass
         
-
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     def merge_directories(self, source_directory, destination_directory, overwrite=False) -> None:
@@ -425,7 +368,7 @@ class Interface:
                     continue  ## Skip if the file already exists in the destination directory
 
                 os.makedirs(os.path.dirname(destination_item), exist_ok=True)  ## Create parent directories if necessary
-                shself.toolkit.copy2(source_item, destination_item)
+                shutil.copy2(source_item, destination_item)
 
             elif(os.path.isdir(source_item)):
 

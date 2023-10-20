@@ -35,14 +35,14 @@ class pathHandler:
 
         self.ids, self.names = self.get_folder_properties()
 
-        self.dirs:dict[str,str] = {}
-        self.iteration_dirs:dict[str,str] = {}
-        self.iteration_paths:dict[str,str] = {}
+        self.dirs:dict[int,str] = {}
+        self.iteration_dirs:dict[int,str] = {}
+        self.iteration_paths:dict[int,str] = {}
 
-        for name in self.names:
-            self.dirs[name] = os.path.join(self.file_ensurer.scf_actual_dir, name)
-            self.iteration_dirs[name] = os.path.join(self.dirs[name], "Current Iteration")
-            self.iteration_paths[name] = os.path.join(self.iteration_dirs[name], "iteration.txt")
+        for i, name in enumerate(self.names):
+            self.dirs[i+1] = os.path.join(self.file_ensurer.scf_actual_dir, name)
+            self.iteration_dirs[i+1] = os.path.join(self.dirs[i+1], "Current Iteration")
+            self.iteration_paths[i+1] = os.path.join(self.iteration_dirs[i+1], "iteration.txt")
 
 ##--------------------start-of-get_folder_properties()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
