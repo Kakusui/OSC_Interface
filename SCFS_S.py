@@ -9,14 +9,13 @@ from pydrive.drive import GoogleDrive
 from apiclient import discovery
 
 ## custom modules
-from modules import util
 
 
-class SCFS:
+class OSC:
 
     """
-    
-    The SCFS class, used for backing up files.\n
+
+    Used for interacting with the OSC.\n
 
     """
 
