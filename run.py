@@ -294,6 +294,9 @@ class Interface:
         with open(self.file_ensurer.file_names_path , "r+", encoding="utf-8") as file:
             filenames = file.readlines()
 
+        with open(self.file_ensurer.blacklist_path , "r+", encoding="utf-8") as file:
+            blacklist = file.readlines()
+
         ## destination folder for the scf folder
         destination_scf = os.path.join(self.file_ensurer.usb_path, "SCF")
 
@@ -327,7 +330,7 @@ class Interface:
         except:
             pass
 
-        self.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True)
+        self.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True, blacklist_directories=blacklist)
 
         try:
             shutil.rmtree(self.file_ensurer.scf_host_dir)
@@ -344,7 +347,7 @@ class Interface:
         
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def merge_directories(self, source_directory, destination_directory, overwrite=False) -> None:
+    def merge_directories(self, source_directory, destination_directory, overwrite=False, blacklist_directories=[]) -> None:
 
         """
 
@@ -373,6 +376,9 @@ class Interface:
                 shutil.copy2(source_item, destination_item)
 
             elif(os.path.isdir(source_item)):
+
+                if(item in blacklist_directories):
+                    continue
 
                 if(os.path.exists(destination_item) and not overwrite):
                     ## Merge the contents of the source directory into the existing destination directory

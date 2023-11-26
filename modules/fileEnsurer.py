@@ -135,6 +135,8 @@ class fileEnsurer:
 
       self.file_names_path = os.path.join(self.local_config_dir, "file_names.txt")
 
+      self.blacklist_path = os.path.join(self.local_config_dir, "blacklist.txt")
+
       self.file_handler.standard_create_file(self.folder_ids_path)
 
 ##--------------------start-of-ensure_interface_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
