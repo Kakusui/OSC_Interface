@@ -1,68 +1,37 @@
 ## built-in modules
 import os
-import typing
 
-## custom modules
-from modules.logger import logger
-
-class toolkit():
+class Toolkit():
 
     """
     
-    The class for a bunch of utility functions used throughout Kanrisha.\n
+    The class for a bunch of utility functions used throughout OSCInterface.
 
     """
-
-##-------------------start-of-__init__()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    def __init__(self, inc_logger:logger) -> None:
-
-        """
-        
-        Constructor for the toolkit class.\n
-
-        Parameters:\n
-        inc_logger (object - logger) : the logger object.\n
-
-        Returns:\n
-        None.\n
-
-        """
-
-        self.logger = inc_logger
-
 ##-------------------start-of-clear_console()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def clear_console(self) -> None:
+    @staticmethod
+    def clear_console() -> None:
 
         """
 
-        clears the console\n
-
-        Parameters:\n
-        self (object - toolkit) : the toolkit object.\n
-
-        Returns:\n
-        None\n
+        Clears the console.
 
         """
 
         os.system('cls' if os.name == 'nt' else 'clear')
-        
+
 ##-------------------start-of-pause_console()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def pause_console(self, message:str="Press any key to continue...") -> None:
+    @staticmethod
+    def pause_console(message:str="Press any key to continue...") -> None:
 
         """
 
-        Pauses the console.\n
+        Pauses the console.
 
-        Parameters:\n
-        self (object - toolkit) : the toolkit object.\n
-        message (str | optional) : the message that will be displayed when the console is paused.\n
-
-        Returns:\n
-        None\n
+        Parameters:
+        message (str | optional) : the message that will be displayed when the console is paused.
 
         """
 

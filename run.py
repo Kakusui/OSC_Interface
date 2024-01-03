@@ -11,10 +11,11 @@ from apiclient import discovery
 from googleapiclient.http import BatchHttpRequest
 
 ## custom modules
-from modules.fileEnsurer import fileEnsurer
-from modules.toolkit import toolkit
+from modules.file_ensurer import FileEnsurer
+from modules.toolkit import Toolkit
 
-from handlers.pathHandler import pathHandler
+from handlers.file_handler import FileHandler
+
 
 class Interface:
 
@@ -24,41 +25,15 @@ class Interface:
 
     """
 
-##-------------------start-of-__init__()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    marked_for_deletion = []
 
-    def __init__(self) -> None:
-
-        """
-        
-        Initializes the Interface class.
-
-        """
-
-        ##--------------------------------------------------------------objects----------------------------------------------------------------
-
-        self.file_ensurer = fileEnsurer()
-
-        self.toolkit = toolkit(self.file_ensurer.logger)
-
-        self.path_handler = pathHandler(self.file_ensurer)
-
-        ##----------------------------------------------------------------variables----------------------------------------------------------------
-
-        self.marked_for_deletion = []
-
-        #----------------------------------------------------------------run----------------------------------------------------------------
-
-        os.system("title " + "OSC Interface")
-
-        self.file_ensurer.ensure_files()
-
-        self.path_handler.setup()
-
-        self.start_interaction()
+    gauth:GoogleAuth
+    drive:GoogleDrive
 
 ##-------------------start-of-start_interaction()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def start_interaction(self) -> None:
+    @staticmethod
+    def start_interaction() -> None:
 
         """
         
@@ -66,159 +41,146 @@ class Interface:
 
         """
 
-        ## if usb that we are transferring to does not exist than exit
-        if(not os.path.exists(self.file_ensurer.usb_path)):
-            print(self.file_ensurer.usb_path + " Does not exist\n")
 
-            self.toolkit.pause_console()
+        os.system("title " + "OSC Interface")
+
+        FileEnsurer.ensure_files()
+
+        FileEnsurer.setup_iteration_paths()
+
+        ## if usb that we are transferring to does not exist than exit
+        if(not os.path.exists(FileEnsurer.usb_path)):
+            print(FileEnsurer.usb_path + " Does not exist\n")
+
+            Toolkit.pause_console()
             exit()
 
         ## no need to run multiple times a day
-        with open(self.file_ensurer.last_run_path, "r+") as f:
+        with open(FileEnsurer.last_run_path, "r+") as f:
             if(f.read() == datetime.datetime.now().strftime("%m/%d/%Y")):
                 print("Already ran today\n")
 
-                self.toolkit.pause_console()
+                Toolkit.pause_console()
                 exit()
 
-        self.transfer()
+        Interface.transfer()
 
 ##-------------------start-of-transfer()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def transfer(self) -> None:
+    @staticmethod
+    def transfer() -> None:
 
         """
         
-        Begins the transfer process.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Begins the transfer process.
 
         """
 
         try:
-            GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = self.file_ensurer.client_json_path
+            GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = FileEnsurer.client_json_path
             
-            self.gauth = GoogleAuth()
-            self.gauth.LocalWebserverAuth()
-            self.drive = GoogleDrive(self.gauth)
+            Interface.gauth = GoogleAuth()
+            Interface.gauth.LocalWebserverAuth()
+            Interface.drive = GoogleDrive(Interface.gauth)
 
         except Exception as e:
-            self.toolkit.clear_console()
+            Toolkit.clear_console()
 
             print("Cloud Authentication Failed Due to : " + str(e))
             
-            self.toolkit.pause_console()
+            Toolkit.pause_console()
             
             exit()
 
-        self.toolkit.clear_console()
+        Toolkit.clear_console()
 
-        self.setup_scf_folder()
+        Interface.setup_scf_folder()
 
-        self.download_files()
+        Interface.download_files()
 
-        self.move_folders()
+        Interface.move_folders()
 
-        self.delete_files()
+        Interface.delete_files()
 
         currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
 
-        with open(self.file_ensurer.last_run_path, "w+", encoding="utf-8") as file:
+        with open(FileEnsurer.last_run_path, "w+", encoding="utf-8") as file:
             file.write(currentDate)
 
 ##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def setup_scf_folder(self) -> None:
+    @staticmethod
+    def setup_scf_folder() -> None:
 
         """
         
-        Setups the scf folder.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Setups the scf folder.
 
         """
 
-        self.file_ensurer.file_handler.standard_create_directory(self.file_ensurer.scf_host_dir)
-        self.file_ensurer.file_handler.standard_create_directory(self.file_ensurer.scf_actual_dir)
+        FileHandler.standard_create_directory(FileEnsurer.scf_host_dir)
+        FileHandler.standard_create_directory(FileEnsurer.scf_actual_dir)
         
-        for path in self.path_handler.dirs.values():
-            self.file_ensurer.file_handler.standard_create_directory(path)
+        for path in FileEnsurer.dirs.values():
+            FileHandler.standard_create_directory(path)
 
-        for path in self.path_handler.iteration_dirs.values():
-            self.file_ensurer.file_handler.standard_create_directory(path)
+        for path in FileEnsurer.iteration_dirs.values():
+            FileHandler.standard_create_directory(path)
 
-        for path in self.path_handler.iteration_paths.values():
-            self.file_ensurer.file_handler.modified_create_file(path, "1")
+        for path in FileEnsurer.iteration_paths.values():
+            FileHandler.modified_create_file(path, "1")
         
-##-------------------Start-of-download_files()-------------------------------------------------
+##-------------------start-of-download_files()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def download_files(self) -> None:
+    @staticmethod
+    def download_files() -> None:
 
         """
         
-        Downloads all files in a google drive folder.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Downloads all files in a google drive folder.
 
         """
 
-        for i, id in enumerate(self.path_handler.ids):
+        for i, id in enumerate(FileEnsurer.ids):
 
             if(i >= 6):
                 break
 
             id = id.strip()
             query = "mimeType != 'application/vnd.google-apps.folder' and trashed = false and '{}' in parents".format(id)
-            fileList = self.drive.ListFile({'q': query}).GetList()
+            fileList = Interface.drive.ListFile({'q': query}).GetList()
 
             for drive_file in fileList:
-                self.marked_for_deletion.append(drive_file['id'])
+                Interface.marked_for_deletion.append(drive_file['id'])
 
-                downloaded_file = self.drive.CreateFile({'id': drive_file['id']})
+                downloaded_file = Interface.drive.CreateFile({'id': drive_file['id']})
 
-                file_path = self.get_file_path(i + 1)
+                file_path = Interface.get_file_path(i + 1)
 
                 print("Downloading {} as {}".format(downloaded_file['title'], file_path))
                 downloaded_file.GetContentFile(file_path + "." + drive_file['fileExtension'])
 
-##-------------------Start-of-delete_files()-------------------------------------------------
+##-------------------start-of-delete_files()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def delete_files(self) -> None:
+    @staticmethod
+    def delete_files() -> None:
 
         """
         
-        Deletes all files that have been marked for deletion.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Deletes all files that have been marked for deletion.
 
         """
 
         i = 0
 
-        service = discovery.build('drive', 'v3', credentials=self.gauth.credentials)
+        service = discovery.build('drive', 'v3', credentials=Interface.gauth.credentials)
         batch:BatchHttpRequest = service.new_batch_http_request()
 
-        for id in self.marked_for_deletion:
+        for id in Interface.marked_for_deletion:
 
             id = id.strip()
 
-            f = self.drive.CreateFile({'id':  id})
+            f = Interface.drive.CreateFile({'id':  id})
 
             print("Trashing {}".format(f['title']))
 
@@ -232,25 +194,20 @@ class Interface:
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
-    def get_file_path(self, file_type:int) -> str:
+    @staticmethod
+    def get_file_path(file_type:int) -> str:
 
         """
         
-        Gets a new file path for a downloaded file.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Gets a new file path for a downloaded file.
 
         """ 
         
         directory = datetime.datetime.today().strftime('%Y-%m-%d')
         
-        path = os.path.join(self.path_handler.dirs[file_type], directory)
+        path = os.path.join(FileEnsurer.dirs[file_type], directory)
 
-        with open(self.path_handler.iteration_paths[file_type], "r", encoding="utf8") as f:
+        with open(FileEnsurer.iteration_paths[file_type], "r", encoding="utf8") as f:
             iteration = int(f.read())
 
         os.makedirs(path, exist_ok=True)
@@ -258,39 +215,34 @@ class Interface:
         file_path = path + "/" + directory + "-" + str(iteration)
         iteration += 1
 
-        with open(self.path_handler.iteration_paths[file_type], "w", encoding="utf8") as f:
+        with open(FileEnsurer.iteration_paths[file_type], "w", encoding="utf8") as f:
             f.write(str(iteration))
 
         return file_path
 
 ##-------------------start-of-move_folders()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def move_folders(self) -> None:
+    @staticmethod
+    def move_folders() -> None:
 
         """
         
-        Transfers all downloaded files to the designated usb.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Transfers all downloaded files to the designated usb.
 
         """
 
-        with open(self.file_ensurer.file_names_path , "r+", encoding="utf-8") as file:
+        with open(FileEnsurer.file_names_path , "r+", encoding="utf-8") as file:
             filenames = file.readlines()
 
-        with open(self.file_ensurer.blacklist_path , "r+", encoding="utf-8") as file:
+        with open(FileEnsurer.blacklist_path , "r+", encoding="utf-8") as file:
             blacklist = file.readlines()
 
         ## destination folder for the scf folder
-        destination_scf = os.path.join(self.file_ensurer.usb_path, "SCF")
+        destination_scf = os.path.join(FileEnsurer.usb_path, "SCF")
 
         ## the paths to the usb device we are transferring to for user and data
-        destination_database_backups = os.path.join(self.file_ensurer.usb_path, filenames[0].strip() + " Backups")
-        destination_user_dir = os.path.join(self.file_ensurer.usb_path, filenames[1].strip())
+        destination_database_backups = os.path.join(FileEnsurer.usb_path, filenames[0].strip() + " Backups")
+        destination_user_dir = os.path.join(FileEnsurer.usb_path, filenames[1].strip())
 
         ## folder for the where the backups folder is
         src_database_backups_dir = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
@@ -303,11 +255,11 @@ class Interface:
         
         print("Merging SCF Folders")
 
-        self.merge_directories(self.file_ensurer.scf_actual_dir, destination_scf, overwrite=True)
+        Interface.merge_directories(FileEnsurer.scf_actual_dir, destination_scf, overwrite=True)
 
         print(f"Merging {filenames[0].strip()} Folders")
 
-        self.merge_directories(database_backup_actual, destination_database_backups, overwrite=True)
+        Interface.merge_directories(database_backup_actual, destination_database_backups, overwrite=True)
 
         print(f"Merging {filenames[1].strip()} Folders")
 
@@ -318,10 +270,10 @@ class Interface:
         except:
             pass
 
-        self.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True, blacklist_directories=blacklist)
+        Interface.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True, blacklist_directories=blacklist)
 
         try:
-            shutil.rmtree(self.file_ensurer.scf_host_dir)
+            shutil.rmtree(FileEnsurer.scf_host_dir)
 
         except:
             pass
@@ -335,19 +287,17 @@ class Interface:
         
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    def merge_directories(self, source_directory, destination_directory, overwrite=False, blacklist_directories=[]) -> None:
+    @staticmethod
+    def merge_directories(source_directory, destination_directory, overwrite=False, blacklist_directories=[]) -> None:
 
         """
 
-        Merge the contents of the source directory into the destination directory.\n
+        Merge the contents of the source directory into the destination directory.
 
         Parameters:\n
-        source_directory (str) : The source directory path.\n
-        destination_directory (str) : The destination directory path.\n
-        overwrite (bool | optional) : If True, overwrite existing files but not directories in the destination directory (default is False).\n
-
-        Returns:\n
-        None.\n
+        source_directory (str) : The source directory path.
+        destination_directory (str) : The destination directory path.
+        overwrite (bool | optional | default=False) : If True, overwrite existing files but not directories in the destination directory.
 
         """
 
@@ -370,12 +320,12 @@ class Interface:
 
                 if(os.path.exists(destination_item) and not overwrite):
                     ## Merge the contents of the source directory into the existing destination directory
-                    self.merge_directories(source_item, destination_item, overwrite)
+                    Interface.merge_directories(source_item, destination_item, overwrite)
                 else:
                     ## If destination directory doesn't exist, create it and copy the contents
                     os.makedirs(destination_item, exist_ok=True)
-                    self.merge_directories(source_item, destination_item, overwrite)
+                    Interface.merge_directories(source_item, destination_item, overwrite)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Interface()
+Interface.start_interaction()
