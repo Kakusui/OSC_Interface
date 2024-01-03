@@ -20,7 +20,7 @@ class Interface:
 
     """
 
-    Used for interfacing with the OSC.\n
+    Used for interfacing with the OSC.
 
     """
 
@@ -30,13 +30,7 @@ class Interface:
 
         """
         
-        Initializes the Interface class.\n
-
-        Parameters:\n
-        None.\n
-
-        Returns:\n
-        None.\n
+        Initializes the Interface class.
 
         """
 
@@ -68,13 +62,7 @@ class Interface:
 
         """
         
-        Start the interaction with OSC.\n
-
-        Parameters:\n
-        self (object - Interface) : the Interface object.\n
-
-        Returns:\n
-        None.\n
+        Start the interaction with OSC.
 
         """
 
