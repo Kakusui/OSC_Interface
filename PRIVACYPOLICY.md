@@ -19,7 +19,7 @@ This Privacy Policy outlines how Okisouchi (OSC) interacts with your Google Driv
 - By linking your Google Drive account with OSC, you hereby give consent to OSC for the aforementioned actions on your files.
 
 ## Changes to This Policy
-- OSC may update this Privacy Policy at any time. Users will be notified of any significant changes.
+- OSC may update this Privacy Policy at any time, with or without prior notification. You are advised to review this policy periodically for any changes.
 
 ## Contact
 - If you have any questions or concerns about this Privacy Policy, please contact [Tetralon07@gmail.com](mailto:Tetralon07@gmail.com).
