@@ -157,7 +157,7 @@ class Interface:
 
                 file_path = Interface.get_file_path(i + 1)
 
-                print("Downloading {} as {}".format(downloaded_file['title'], file_path))
+                print("Downloading {} as {}".format(downloaded_file['title'], file_path + "." + drive_file['fileExtension']))
                 downloaded_file.GetContentFile(file_path + "." + drive_file['fileExtension'])
 
 ##-------------------start-of-delete_files()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -215,8 +215,17 @@ class Interface:
         file_path = path + "/" + directory + "-" + str(iteration)
         iteration += 1
 
-        with open(FileEnsurer.iteration_paths[file_type], "w", encoding="utf8") as f:
-            f.write(str(iteration))
+        while True:
+
+            try:
+
+                with open(FileEnsurer.iteration_paths[file_type], "w", encoding="utf8") as f:
+                    f.write(str(iteration))
+
+                break
+
+            except PermissionError:
+                pass
 
         return file_path
 
