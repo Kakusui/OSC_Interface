@@ -1,27 +1,23 @@
-# Privacy Policy for Okisouchi (OSC)
-
-## Introduction
-
-This Privacy Policy outlines how Okisouchi (OSC) interacts with your Google Drive account. By using OSC, you agree to the terms of this policy.
-
-## Google Drive File Access
+## Privacy Policy for Okisouchi (OSC)
 
 ### Modification of Files
-- OSC has the authority to **modify** any files in your Google Drive account. This includes altering content, format, and other file attributes.
+- OSC has the authority to **modify** files explicitly specified by the user in the configuration settings of the application. This includes altering content, format, and other file attributes.
 
 ### Deletion of Files
-- OSC reserves the right to **delete** any files from your Google Drive account. Deletion may be permanent and without prior notification.
+- OSC reserves the right to **delete** files as specified by the user through configuration settings within the application. Deletion may be permanent and may occur without prior notification.
 
 ### Viewing of Files
-- OSC is entitled to **view** any and all files stored in your Google Drive account. This includes documents, images, videos, and other file types.
+- OSC accesses files solely through Google's API and does not read or view the actual contents of the files outside of this scope. Access is limited to the files specifically designated by the user in the application's configuration.
 
 ## Consent
-- By linking your Google Drive account with OSC, you hereby give consent to OSC for the aforementioned actions on your files.
+- By linking your Google Drive account with OSC and specifying files in the application's configuration, you hereby give consent to OSC for the aforementioned actions on your files.
 
 ## Changes to This Policy
 - OSC may update this Privacy Policy at any time, with or without prior notification. You are advised to review this policy periodically for any changes.
 
 ## Contact
-- If you have any questions or concerns about this Privacy Policy, please contact [Tetralon07@gmail.com](mailto:Tetralon07@gmail.com).
+- If you have any questions or concerns about this Privacy Policy, please contact [contact@kakusui.org](mailto:contact@kakusui.org).
 
-_Last updated: [12-27-2023]_
+_Last updated: [2024-04-15]_
+
+---
