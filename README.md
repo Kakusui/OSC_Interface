@@ -1,3 +1,3 @@
-**OSC**
+**OSC Inteface*
 ------------------------------------------
-Not intended for usage other than Bikatr7.
+Automates retrival of files from Google Drive and distributes them into predetermined locations.
