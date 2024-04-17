@@ -32,4 +32,6 @@ Kakusui reserves the right to modify or replace these Terms at any time, with or
 #### 10. Contact Information
 If you have any questions about these Terms, please contact us at [contact@kakusui.org](mailto:contact@kakusui.org).
 
----.
+_Last updated: [2024-04-17]_
+
+---
