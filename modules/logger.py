@@ -112,7 +112,7 @@ class Logger:
         Generates a timestamp for an action taken by Kudasai.
 
         Returns:
-        time_stamp (string) : The timestamp for the action.        
+        time_stamp (string) : the timestamp for the action.        
         
         """
 

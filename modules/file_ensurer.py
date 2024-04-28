@@ -137,7 +137,7 @@ class FileEnsurer:
 
       for i, name in enumerate(FileEnsurer.names):
          FileEnsurer.dirs[i+1] = os.path.join(FileEnsurer.scf_actual_dir, name)
-         FileEnsurer.iteration_dirs[i+1] = os.path.join(FileEnsurer.dirs[i+1], "Current Iteration")
+         FileEnsurer.iteration_dirs[i+1] = os.path.join(FileEnsurer.dirs[i+1], "current_iteration")
          FileEnsurer.iteration_paths[i+1] = os.path.join(FileEnsurer.iteration_dirs[i+1], "iteration.txt")
 
 ##--------------------start-of-get_folder_properties()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -150,8 +150,8 @@ class FileEnsurer:
       Gets the folder properties from the local config files.
 
       Returns:
-      folder_ids (list - str) : The folder ids.
-      folder_names (list - str) : The folder names.
+      folder_ids (list - str) : the folder ids.
+      folder_names (list - str) : the folder names.
       
       """
 
