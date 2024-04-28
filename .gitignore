@@ -2,10 +2,11 @@
 .gitattributes
 .vscode/settings.json
 
-## folders
+## local folders
 modules/__pycache__/
 handlers/__pycache__/
 
+## created folders
 SCF/
 LocalConfig/
 
