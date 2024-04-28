@@ -9,6 +9,9 @@ Simply download the source code, set up your LocalConfig file, and configure the
 - file_names.txt (files to import from)
 - folder_ids.txt (gfolder id's to retrieve content from)
 - folder_names.txt (those gfolder names)
+- target_location.txt (where to put the files)
+
+Provided you're actually serious about using this software, please email [contact@kakusui.org](mailto:contact@kakusui.org) to request a client_secrets.json file.
 
 Once this is completed, you can simply run the run.py file and log in through Google, and your transfer will complete.
 

@@ -1,6 +1,4 @@
 ## built-in modules
-from datetime import datetime, timedelta
-
 import os
 import typing
 
@@ -29,29 +27,28 @@ class FileEnsurer:
    local_config_dir = os.path.join(script_dir, "LocalConfig")
    interface_dir = os.path.join(config_dir, "Interface")
 
-
    scf_host_dir = os.path.join(script_dir, "SCF")
    scf_actual_dir = os.path.join(scf_host_dir, "SCF")
 
    ##----------------------------------------------------------------paths----------------------------------------------------------------
 
-   usb_path = "E:\\"
+   ## Local Config
 
+   destination_dir = os.path.join(local_config_dir, "target_location.txt")
    log_path = os.path.join(local_config_dir, "log.txt")
-
    folder_ids_path = os.path.join(local_config_dir, "folder_ids.txt")
    folder_names_path = os.path.join(local_config_dir, "folder_names.txt")
-
    file_names_path = os.path.join(local_config_dir, "file_names.txt")
-
    blacklist_path = os.path.join(local_config_dir, "blacklist.txt")
+
+   ## Interface
 
    client_json_path = os.path.join(interface_dir, "client_secrets.json")
    last_run_path = os.path.join(interface_dir, "last_run.txt")
 
    Logger.log_file_path = log_path
 
-   ##----------------------------------------------------------------constructor----------------------------------------------------------------
+   ##----------------------------------------------------------------variables----------------------------------------------------------------
 
    ids = []
    names = []
@@ -106,8 +103,10 @@ class FileEnsurer:
 
       """
 
+      for file in [FileEnsurer.destination_dir, FileEnsurer.folder_ids_path, FileEnsurer.folder_names_path, FileEnsurer.file_names_path, FileEnsurer.blacklist_path]:
+         if(not os.path.exists(file)):
+            raise FileNotFoundError(f"File {file} not found. Please ensure that the file is present and filled as specified in the documentation and try again.")
 
-      FileHandler.standard_create_file(FileEnsurer.folder_ids_path)
 
 ##--------------------start-of-ensure_interface_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

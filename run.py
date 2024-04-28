@@ -3,7 +3,6 @@ import datetime
 import os
 import shutil
 
-
 ## third party libraries
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -16,12 +15,11 @@ from modules.toolkit import Toolkit
 
 from handlers.file_handler import FileHandler
 
-
 class Interface:
 
     """
 
-    Used for interfacing with the OSC.
+    Used for interfacing with the OSC(Okisouchi)
 
     """
 
@@ -29,6 +27,8 @@ class Interface:
 
     gauth:GoogleAuth
     drive:GoogleDrive
+
+    destination:str
 
 ##-------------------start-of-start_interaction()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -48,9 +48,11 @@ class Interface:
 
         FileEnsurer.setup_iteration_paths()
 
+        Interface.destination = FileHandler.standard_read_file(FileEnsurer.destination_dir)
+
         ## if usb that we are transferring to does not exist than exit
-        if(not os.path.exists(FileEnsurer.usb_path)):
-            print(FileEnsurer.usb_path + " Does not exist\n")
+        if(not os.path.exists(Interface.destination)):
+            print(Interface.destination + " Does not exist\n")
 
             Toolkit.pause_console()
             exit()
@@ -247,11 +249,11 @@ class Interface:
             blacklist = file.readlines()
 
         ## destination folder for the scf folder
-        destination_scf = os.path.join(FileEnsurer.usb_path, "SCF")
+        destination_scf = os.path.join(Interface.destination, "SCF")
 
         ## the paths to the usb device we are transferring to for user and data
-        destination_database_backups = os.path.join(FileEnsurer.usb_path, filenames[0].strip() + " Backups")
-        destination_user_dir = os.path.join(FileEnsurer.usb_path, filenames[1].strip())
+        destination_database_backups = os.path.join(Interface.destination, filenames[0].strip() + " Backups")
+        destination_user_dir = os.path.join(Interface.destination, filenames[1].strip())
 
         ## folder for the where the backups folder is
         src_database_backups_dir = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
