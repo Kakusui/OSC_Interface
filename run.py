@@ -305,10 +305,10 @@ class Interface:
 
         Merge the contents of the source directory into the destination directory.
 
-        Parameters:\n
-        source_directory (str) : The source directory path.
-        destination_directory (str) : The destination directory path.
-        overwrite (bool | optional | default=False) : If True, overwrite existing files but not directories in the destination directory.
+        Parameters:
+        source_directory (str) : the source directory path.
+        destination_directory (str) : the destination directory path.
+        overwrite (bool | optional | default=False) : if true, overwrite existing files but not directories in the destination directory.
 
         """
 
