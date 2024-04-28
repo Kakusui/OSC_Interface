@@ -9,7 +9,7 @@ class FileHandler():
 
     """
     
-    The FileHandler class contains methods for handling files. As well as ID generation and deletion.
+    The FileHandler class contains methods for handling files.
 
     """
 
@@ -23,7 +23,7 @@ class FileHandler():
         Creates a directory if it doesn't exist, as well as logs what was created.
 
         Parameters:
-        directory_path (str) : Path to the directory to be created.
+        directory_path (str) : path to the directory to be created.
 
         """
 
@@ -41,8 +41,8 @@ class FileHandler():
         Creates a directory if it doesn't exist or if the path provided is blank or empty, as well as logs what was created.
 
         Parameters:
-        directory_path (str) : Path to the directory to be created.
-        path_to_check (str) : Path to check if it is blank.
+        directory_path (str) : path to the directory to be created.
+        path_to_check (str) : path to check if it is blank.
 
         """
 
@@ -63,7 +63,7 @@ class FileHandler():
         Creates a file if it doesn't exist, truncates it, as well as logs what was created.
 
         Parameters:
-        file_path (str) : Path to the file to be created.
+        file_path (str) : path to the file to be created.
 
         """
 
@@ -82,12 +82,12 @@ class FileHandler():
         Creates a path if it doesn't exist or if it is blank or empty, writes to it, as well as logs what was created and written.
 
         Parameters:
-        file_path (str) : Path to the file to be created.
-        content to write (str) : Content to be written to the file.
-        omit (bool | optional | default = True) : Whether to omit the content written to the file in the log.
+        file_path (str) : path to the file to be created.
+        content to write (str) : content to be written to the file.
+        omit (bool | optional | default = True) : whether to omit the content written to the file in the log.
 
         Returns:
-        did_overwrite (bool) : Whether the file was created.
+        did_overwrite (bool) : whether the file was created.
 
         """
 
@@ -116,9 +116,9 @@ class FileHandler():
         Writes to a file, creates it if it doesn't exist, overwrites it if it does, as well as logs what was written.
 
         Parameters:
-        file_path (str) : Path to the file to be overwritten.
-        content to write (str | list - str) : Content to be written to the file.
-        omit (bool | optional | default = True) : Whether to omit the content written to the file in the log.
+        file_path (str) : path to the file to be overwritten.
+        content to write (str | list - str) : content to be written to the file.
+        omit (bool | optional | default = True) : whether to omit the content written to the file in the log.
 
         """
 
@@ -143,7 +143,7 @@ class FileHandler():
         Clears a file, as well as logs what was cleared.
 
         Parameters:
-        file_path (str) : Path to the file to be cleared.
+        file_path (str) : path to the file to be cleared.
 
         """
 
@@ -162,10 +162,10 @@ class FileHandler():
         Reads a file and returns its content.
 
         Parameters:
-        file_path (str) : Path to the file to be read.
+        file_path (str) : path to the file to be read.
 
         Returns:
-        content (str) : The content of the file.
+        content (str) : the content of the file.
 
         """
 
