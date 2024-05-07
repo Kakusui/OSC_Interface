@@ -38,8 +38,8 @@ class FileEnsurer:
    log_path = os.path.join(local_config_dir, "log.txt")
    folder_ids_path = os.path.join(local_config_dir, "folder_ids.txt")
    folder_names_path = os.path.join(local_config_dir, "folder_names.txt")
-   file_names_path = os.path.join(local_config_dir, "file_names.txt")
-   blacklist_path = os.path.join(local_config_dir, "blacklist.txt")
+   file_paths_path = os.path.join(local_config_dir, "file_paths.txt")
+   blacklist_path = os.path.join(local_config_dir, "blacklisted_names.txt")
 
    ## Interface
 
@@ -103,7 +103,7 @@ class FileEnsurer:
 
       """
 
-      for file in [FileEnsurer.destination_dir, FileEnsurer.folder_ids_path, FileEnsurer.folder_names_path, FileEnsurer.file_names_path, FileEnsurer.blacklist_path]:
+      for file in [FileEnsurer.destination_dir, FileEnsurer.folder_ids_path, FileEnsurer.folder_names_path, FileEnsurer.file_paths_path, FileEnsurer.blacklist_path]:
          if(not os.path.exists(file)):
             raise FileNotFoundError(f"File {file} not found. Please ensure that the file is present and filled as specified in the documentation and try again.")
 

@@ -50,20 +50,12 @@ class Interface:
 
         Interface.destination = FileHandler.standard_read_file(FileEnsurer.destination_dir)
 
-        ## if usb that we are transferring to does not exist than exit
+        ## if destination that we are transferring to does not exist than exit
         if(not os.path.exists(Interface.destination)):
             print(Interface.destination + " Does not exist\n")
 
             Toolkit.pause_console()
             exit()
-
-        ## no need to run multiple times a day
-        with open(FileEnsurer.last_run_path, "r+") as f:
-            if(f.read() == datetime.datetime.now().strftime("%m/%d/%Y")):
-                print("Already ran today\n")
-
-                Toolkit.pause_console()
-                exit()
 
         Interface.transfer()
 
@@ -242,8 +234,8 @@ class Interface:
 
         """
 
-        with open(FileEnsurer.file_names_path , "r+", encoding="utf-8") as file:
-            filenames = file.readlines()
+        with open(FileEnsurer.file_paths_path , "r+", encoding="utf-8") as file:
+            folders_to_copy = file.readlines()
 
         with open(FileEnsurer.blacklist_path , "r+", encoding="utf-8") as file:
             blacklist = file.readlines()
@@ -251,51 +243,31 @@ class Interface:
         ## destination folder for the scf folder
         destination_scf = os.path.join(Interface.destination, "SCF")
 
-        ## the paths to the usb device we are transferring to for user and data
-        destination_database_backups = os.path.join(Interface.destination, filenames[0].strip() + " Backups")
-        destination_user_dir = os.path.join(Interface.destination, filenames[1].strip())
-
-        ## folder for the where the backups folder is
-        src_database_backups_dir = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
-
-        ## backups folder for the database files
-        database_backup_actual = os.path.join(src_database_backups_dir, f"{filenames[0].strip()} Backups")
-
-        ## main user folder
-        desktop_user_directory = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"), filenames[1].strip())
         
         print("Merging SCF Folders")
 
         Interface.merge_directories(FileEnsurer.scf_actual_dir, destination_scf, overwrite=True)
 
-        print(f"Merging {filenames[0].strip()} Folders")
+        print(f"Merging {folders_to_copy[0].strip()} Folders")
 
-        Interface.merge_directories(database_backup_actual, destination_database_backups, overwrite=True)
+        for folder_path in folders_to_copy:
+            folder_path = folder_path.strip()
 
-        print(f"Merging {filenames[1].strip()} Folders")
+            folder_name = os.path.basename(folder_path)
 
-        try:
-            shutil.rmtree(destination_user_dir)
-            os.mkdir(destination_user_dir)
+            if(folder_name in blacklist):
+                continue
 
-        except:
-            pass
+            destination_folder = os.path.join(Interface.destination, folder_name)
 
-        Interface.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True, blacklist_directories=blacklist)
+            Interface.merge_directories(folder_path, destination_folder, overwrite=True, blacklist_directories=blacklist)
 
+        ## gets rid of the files we just copied
         try:
             shutil.rmtree(FileEnsurer.scf_host_dir)
 
         except:
             pass
-
-        try:
-            shutil.rmtree(database_backup_actual)
-            os.mkdir(database_backup_actual)
-
-        except:
-            pass
-        
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
@@ -309,6 +281,7 @@ class Interface:
         source_directory (str) : the source directory path.
         destination_directory (str) : the destination directory path.
         overwrite (bool | optional | default=False) : if true, overwrite existing files but not directories in the destination directory.
+        blacklist_directories (list | optional | default=[]) : list of directory names to ignore during the merge.
 
         """
 
