@@ -94,7 +94,7 @@ class Interface:
 
         Interface.move_folders()
 
-        Interface.delete_files()
+    ##    Interface.delete_files()
 
         currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
 
@@ -243,24 +243,20 @@ class Interface:
         ## destination folder for the scf folder
         destination_scf = os.path.join(Interface.destination, "SCF")
 
-        
         print("Merging SCF Folders")
 
         Interface.merge_directories(FileEnsurer.scf_actual_dir, destination_scf, overwrite=True)
 
-        print(f"Merging {folders_to_copy[0].strip()} Folders")
+        print("Merging Files from Local to Destination")
 
         for folder_path in folders_to_copy:
             folder_path = folder_path.strip()
 
             folder_name = os.path.basename(folder_path)
 
-            if(folder_name in blacklist):
-                continue
-
             destination_folder = os.path.join(Interface.destination, folder_name)
 
-            Interface.merge_directories(folder_path, destination_folder, overwrite=True, blacklist_directories=blacklist)
+            Interface.merge_directories(folder_path, destination_folder, overwrite=True)
 
         ## gets rid of the files we just copied
         try:
@@ -271,7 +267,7 @@ class Interface:
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def merge_directories(source_directory, destination_directory, overwrite=False, blacklist_directories=[]) -> None:
+    def merge_directories(source_directory, destination_directory, overwrite=False) -> None:
 
         """
 
@@ -298,9 +294,6 @@ class Interface:
                 shutil.copy2(source_item, destination_item)
 
             elif(os.path.isdir(source_item)):
-
-                if(item in blacklist_directories):
-                    continue
 
                 if(os.path.exists(destination_item) and not overwrite):
                     ## Merge the contents of the source directory into the existing destination directory
