@@ -238,6 +238,9 @@ class Interface:
         ## destination folder for the downloaded files
         downloaded_folders_destination_path = os.path.join(Interface.destination, FileEnsurer.downloaded_files_directory_name)
 
+        if(not os.path.exists(downloaded_folders_destination_path)):
+            os.mkdir(downloaded_folders_destination_path)
+
         logging.info("Merging Files from Local to Destination")
 
         Interface.merge_directories(FileEnsurer.local_downloaded_files_actual_dir, downloaded_folders_destination_path, overwrite=True)
