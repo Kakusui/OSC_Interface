@@ -245,7 +245,6 @@ class Interface:
 
         Interface.merge_directories(FileEnsurer.local_downloaded_files_actual_dir, downloaded_folders_destination_path, overwrite=True)
 
-        print("Merging Files from Local to Destination")
 
         for folder_path in folders_to_copy:
             folder_path = folder_path.strip()

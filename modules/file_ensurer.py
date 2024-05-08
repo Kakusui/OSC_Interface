@@ -134,7 +134,7 @@ class FileEnsurer:
       FileEnsurer.ids, FileEnsurer.names = FileEnsurer.get_folder_properties()
 
       for i, name in enumerate(FileEnsurer.names):
-         FileEnsurer.dirs[i+1] = os.path.join(FileEnsurer.local_downloaded_files_host_dir, name)
+         FileEnsurer.dirs[i+1] = os.path.join(FileEnsurer.local_downloaded_files_actual_dir, name)
          FileEnsurer.iteration_dirs[i+1] = os.path.join(FileEnsurer.dirs[i+1], "current_iteration")
          FileEnsurer.iteration_paths[i+1] = os.path.join(FileEnsurer.iteration_dirs[i+1], "iteration.txt")
 
