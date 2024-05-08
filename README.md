@@ -4,14 +4,14 @@
 The OSC Interface is an open-source tool designed to automate the retrieval of files from Google Drive and distribute them into predetermined locations. This software simplifies managing and organizing files, offering integration with their Google Drive accounts.
 
 ## To Use
-Simply download the source code, set up your LocalConfig file, and configure the following paths:
-- blacklist.txt (folder names to ignore when merging directories)
-- file_names.txt (files to import from)
-- folder_ids.txt (gfolder id's to retrieve content from)
-- folder_names.txt (those gfolder names)
-- target_location.txt (where to put the files)
-
 Provided you're actually serious about using this software, please email [contact@kakusui.org](mailto:contact@kakusui.org) to request a client_secrets.json file.
+
+Simply download the source code, set up your localconfig directory by creating the directory and adding the following files:
+- downloaded_files_directory_name (name of the directory to download files to, this will be newly created locally and also be where your files are transferred to)
+- file_paths_to_transfer.txt (Additional file paths to transfer to the target location, these should be full local paths, one per line)
+- google_folder_ids.txt (the folder ids of the folders you want to download from, these can be found in the URL of the folder)
+- google_folder_names.txt (the names of the folders you want to download from, these should be the names of the folders in your Google Drive)
+- target_location.txt (where to put the files, this should be a full local path, or a usb stick like E://)
 
 Once this is completed, you can simply run the run.py file and log in through Google, and your transfer will complete.
 
