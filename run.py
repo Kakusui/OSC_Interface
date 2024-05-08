@@ -96,7 +96,7 @@ class Interface:
 
         Interface.move_folders()
 
-    ##    Interface.delete_files()
+        Interface.delete_files()
 
 ##-------------------start-of-setup_local_download_folder_storage()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
