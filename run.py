@@ -2,6 +2,7 @@
 import datetime
 import os
 import shutil
+import logging
 
 ## third party libraries
 from pydrive.auth import GoogleAuth
@@ -15,15 +16,16 @@ from modules.toolkit import Toolkit
 
 from handlers.file_handler import FileHandler
 
+
 class Interface:
 
     """
 
-    Used for interfacing with the OSC(Okisouchi)
+    Used for interfacing with the OSC (Okisouchi)
 
     """
 
-    marked_for_deletion = []
+    google_folder_ids_marked_for_deletion = []
 
     gauth:GoogleAuth
     drive:GoogleDrive
@@ -48,22 +50,14 @@ class Interface:
 
         FileEnsurer.setup_iteration_paths()
 
-        Interface.destination = FileHandler.standard_read_file(FileEnsurer.destination_dir)
+        Interface.destination = FileHandler.standard_read_file(FileEnsurer.target_location_path)
 
-        ## if usb that we are transferring to does not exist than exit
+        ## if destination that we are transferring to does not exist than exit
         if(not os.path.exists(Interface.destination)):
             print(Interface.destination + " Does not exist\n")
 
             Toolkit.pause_console()
             exit()
-
-        ## no need to run multiple times a day
-        with open(FileEnsurer.last_run_path, "r+") as f:
-            if(f.read() == datetime.datetime.now().strftime("%m/%d/%Y")):
-                print("Already ran today\n")
-
-                Toolkit.pause_console()
-                exit()
 
         Interface.transfer()
 
@@ -96,7 +90,7 @@ class Interface:
 
         Toolkit.clear_console()
 
-        Interface.setup_scf_folder()
+        Interface.setup_local_download_folder_storage()
 
         Interface.download_files()
 
@@ -104,24 +98,19 @@ class Interface:
 
         Interface.delete_files()
 
-        currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
-
-        with open(FileEnsurer.last_run_path, "w+", encoding="utf-8") as file:
-            file.write(currentDate)
-
-##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+##-------------------start-of-setup_local_download_folder_storage()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def setup_scf_folder() -> None:
+    def setup_local_download_folder_storage() -> None:
 
         """
         
-        Setups the scf folder.
+        Setups the local download folder storage.
 
         """
 
-        FileHandler.standard_create_directory(FileEnsurer.scf_host_dir)
-        FileHandler.standard_create_directory(FileEnsurer.scf_actual_dir)
+        FileHandler.standard_create_directory(FileEnsurer.local_downloaded_files_host_dir)
+        FileHandler.standard_create_directory(FileEnsurer.local_downloaded_files_actual_dir)
         
         for path in FileEnsurer.dirs.values():
             FileHandler.standard_create_directory(path)
@@ -145,22 +134,23 @@ class Interface:
 
         for i, id in enumerate(FileEnsurer.ids):
 
-            if(i >= 6):
-                break
 
             id = id.strip()
             query = "mimeType != 'application/vnd.google-apps.folder' and trashed = false and '{}' in parents".format(id)
             fileList = Interface.drive.ListFile({'q': query}).GetList()
 
             for drive_file in fileList:
-                Interface.marked_for_deletion.append(drive_file['id'])
-
+        
                 downloaded_file = Interface.drive.CreateFile({'id': drive_file['id']})
 
                 file_path = Interface.get_file_path(i + 1)
 
-                print("Downloading {} as {}".format(downloaded_file['title'], file_path + "." + drive_file['fileExtension']))
+                logging.info("Downloading {} as {}".format(downloaded_file['title'], file_path + "." + drive_file['fileExtension']))
+
                 downloaded_file.GetContentFile(file_path + "." + drive_file['fileExtension'])
+
+                Interface.google_folder_ids_marked_for_deletion.append(drive_file['id'])
+                logging.info("Marking {} for deletion".format(downloaded_file['title']))
 
 ##-------------------start-of-delete_files()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -176,23 +166,22 @@ class Interface:
         i = 0
 
         service = discovery.build('drive', 'v3', credentials=Interface.gauth.credentials)
-        batch:BatchHttpRequest = service.new_batch_http_request()
+        batch:BatchHttpRequest = service.new_batch_http
 
-        for id in Interface.marked_for_deletion:
+        for id in Interface.google_folder_ids_marked_for_deletion:
 
             id = id.strip()
 
             f = Interface.drive.CreateFile({'id':  id})
 
-            print("Trashing {}".format(f['title']))
+            logging.info("Trashing {}".format(f['title']))
 
             batch.add(service.files().delete(fileId=f['id']))
             i += 1
 
         if(i != 0):
-            print("Deleting Files")
-
-        batch.execute()
+            logging.info("Deleting {} files".format(i))
+            batch.execute()
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
@@ -227,6 +216,7 @@ class Interface:
                 break
 
             except PermissionError:
+                logging.warning(f"Permission Error: {file_path} cannot be accessed")
                 pass
 
         return file_path
@@ -242,64 +232,38 @@ class Interface:
 
         """
 
-        with open(FileEnsurer.file_names_path , "r+", encoding="utf-8") as file:
-            filenames = file.readlines()
+        with open(FileEnsurer.transfer_file_paths , "r+", encoding="utf-8") as file:
+            folders_to_copy = file.readlines()
 
-        with open(FileEnsurer.blacklist_path , "r+", encoding="utf-8") as file:
-            blacklist = file.readlines()
+        ## destination folder for the downloaded files
+        downloaded_folders_destination_path = os.path.join(Interface.destination, FileEnsurer.downloaded_files_directory_name)
 
-        ## destination folder for the scf folder
-        destination_scf = os.path.join(Interface.destination, "SCF")
+        if(not os.path.exists(downloaded_folders_destination_path)):
+            os.mkdir(downloaded_folders_destination_path)
 
-        ## the paths to the usb device we are transferring to for user and data
-        destination_database_backups = os.path.join(Interface.destination, filenames[0].strip() + " Backups")
-        destination_user_dir = os.path.join(Interface.destination, filenames[1].strip())
+        logging.info("Merging Files from Local to Destination")
 
-        ## folder for the where the backups folder is
-        src_database_backups_dir = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"),filenames[0].strip())
+        Interface.merge_directories(FileEnsurer.local_downloaded_files_actual_dir, downloaded_folders_destination_path, overwrite=True)
 
-        ## backups folder for the database files
-        database_backup_actual = os.path.join(src_database_backups_dir, f"{filenames[0].strip()} Backups")
 
-        ## main user folder
-        desktop_user_directory = os.path.join(os.path.join(os.environ['USERPROFILE'], "Desktop"), filenames[1].strip())
-        
-        print("Merging SCF Folders")
+        for folder_path in folders_to_copy:
+            folder_path = folder_path.strip()
 
-        Interface.merge_directories(FileEnsurer.scf_actual_dir, destination_scf, overwrite=True)
+            folder_name = os.path.basename(folder_path)
 
-        print(f"Merging {filenames[0].strip()} Folders")
+            destination_folder = os.path.join(Interface.destination, folder_name)
 
-        Interface.merge_directories(database_backup_actual, destination_database_backups, overwrite=True)
+            Interface.merge_directories(folder_path, destination_folder, overwrite=True)
 
-        print(f"Merging {filenames[1].strip()} Folders")
-
+        ## gets rid of the files we just copied
         try:
-            shutil.rmtree(destination_user_dir)
-            os.mkdir(destination_user_dir)
-
+            shutil.rmtree(FileEnsurer.local_downloaded_files_host_dir)
         except:
             pass
-
-        Interface.merge_directories(desktop_user_directory, destination_user_dir, overwrite=True, blacklist_directories=blacklist)
-
-        try:
-            shutil.rmtree(FileEnsurer.scf_host_dir)
-
-        except:
-            pass
-
-        try:
-            shutil.rmtree(database_backup_actual)
-            os.mkdir(database_backup_actual)
-
-        except:
-            pass
-        
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def merge_directories(source_directory, destination_directory, overwrite=False, blacklist_directories=[]) -> None:
+    def merge_directories(source_directory, destination_directory, overwrite=False) -> None:
 
         """
 
@@ -309,6 +273,7 @@ class Interface:
         source_directory (str) : the source directory path.
         destination_directory (str) : the destination directory path.
         overwrite (bool | optional | default=False) : if true, overwrite existing files but not directories in the destination directory.
+        blacklist_directories (list | optional | default=[]) : list of directory names to ignore during the merge.
 
         """
 
@@ -326,9 +291,6 @@ class Interface:
 
             elif(os.path.isdir(source_item)):
 
-                if(item in blacklist_directories):
-                    continue
-
                 if(os.path.exists(destination_item) and not overwrite):
                     ## Merge the contents of the source directory into the existing destination directory
                     Interface.merge_directories(source_item, destination_item, overwrite)
@@ -338,5 +300,18 @@ class Interface:
                     Interface.merge_directories(source_item, destination_item, overwrite)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## setup logging
+logging.basicConfig(level=logging.DEBUG, 
+                    filename='osc_interface.log', 
+                    filemode='w', 
+                    format='[%(asctime)s] [%(levelname)s] [%(filename)s] %(message)s', 
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] [%(filename)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
 
 Interface.start_interaction()

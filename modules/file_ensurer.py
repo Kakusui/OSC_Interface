@@ -5,8 +5,6 @@ import typing
 ## custom modules
 from handlers.file_handler import FileHandler
 
-from modules.logger import Logger
-
 class FileEnsurer:
 
    """
@@ -24,29 +22,27 @@ class FileEnsurer:
    else:  ## Linux
       config_dir = os.path.join(os.path.expanduser("~"), "OSCInterfaceConfig")
 
-   local_config_dir = os.path.join(script_dir, "LocalConfig")
-   interface_dir = os.path.join(config_dir, "Interface")
+   local_config_dir = os.path.join(script_dir, "localconfig")
+   interface_dir = os.path.join(config_dir, "interface")
 
-   scf_host_dir = os.path.join(script_dir, "SCF")
-   scf_actual_dir = os.path.join(scf_host_dir, "SCF")
+   with open(os.path.join(local_config_dir, "downloaded_files_directory_name.txt"), "r") as file:
+      downloaded_files_directory_name = file.read().strip()
+
+   local_downloaded_files_host_dir = os.path.join(script_dir, downloaded_files_directory_name)
+   local_downloaded_files_actual_dir = os.path.join(local_downloaded_files_host_dir, downloaded_files_directory_name)
 
    ##----------------------------------------------------------------paths----------------------------------------------------------------
 
    ## Local Config
 
-   destination_dir = os.path.join(local_config_dir, "target_location.txt")
-   log_path = os.path.join(local_config_dir, "log.txt")
-   folder_ids_path = os.path.join(local_config_dir, "folder_ids.txt")
-   folder_names_path = os.path.join(local_config_dir, "folder_names.txt")
-   file_names_path = os.path.join(local_config_dir, "file_names.txt")
-   blacklist_path = os.path.join(local_config_dir, "blacklist.txt")
+   target_location_path = os.path.join(local_config_dir, "target_location.txt")
+   google_folder_ids_file_path = os.path.join(local_config_dir, "google_folder_ids.txt")
+   google_folder_names_file_path = os.path.join(local_config_dir, "google_folder_names.txt")
+   transfer_file_paths = os.path.join(local_config_dir, "file_paths_to_transfer.txt")
 
    ## Interface
 
    client_json_path = os.path.join(interface_dir, "client_secrets.json")
-   last_run_path = os.path.join(interface_dir, "last_run.txt")
-
-   Logger.log_file_path = log_path
 
    ##----------------------------------------------------------------variables----------------------------------------------------------------
 
@@ -103,10 +99,13 @@ class FileEnsurer:
 
       """
 
-      for file in [FileEnsurer.destination_dir, FileEnsurer.folder_ids_path, FileEnsurer.folder_names_path, FileEnsurer.file_names_path, FileEnsurer.blacklist_path]:
+      for file in [FileEnsurer.target_location_path, 
+                   FileEnsurer.google_folder_ids_file_path, 
+                   FileEnsurer.google_folder_names_file_path, 
+                   FileEnsurer.transfer_file_paths]:
+         
          if(not os.path.exists(file)):
             raise FileNotFoundError(f"File {file} not found. Please ensure that the file is present and filled as specified in the documentation and try again.")
-
 
 ##--------------------start-of-ensure_interface_files()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -119,8 +118,7 @@ class FileEnsurer:
 
       """
 
-      FileHandler.standard_create_file(FileEnsurer.client_json_path)
-      FileHandler.modified_create_file(FileEnsurer.last_run_path, "L")
+      assert os.path.exists(FileEnsurer.client_json_path), f"File {FileEnsurer.client_json_path} not found. Please contact Kakusui to be issued a new client_secrets.json file at contact@kakusui.org."
 
 ##--------------------start-of-setup_iteration_paths()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -136,7 +134,7 @@ class FileEnsurer:
       FileEnsurer.ids, FileEnsurer.names = FileEnsurer.get_folder_properties()
 
       for i, name in enumerate(FileEnsurer.names):
-         FileEnsurer.dirs[i+1] = os.path.join(FileEnsurer.scf_actual_dir, name)
+         FileEnsurer.dirs[i+1] = os.path.join(FileEnsurer.local_downloaded_files_actual_dir, name)
          FileEnsurer.iteration_dirs[i+1] = os.path.join(FileEnsurer.dirs[i+1], "current_iteration")
          FileEnsurer.iteration_paths[i+1] = os.path.join(FileEnsurer.iteration_dirs[i+1], "iteration.txt")
 
@@ -155,10 +153,10 @@ class FileEnsurer:
       
       """
 
-      with open(FileEnsurer.folder_ids_path, "r") as file:
+      with open(FileEnsurer.google_folder_ids_file_path, "r") as file:
          folder_ids = [line.strip() for line in file.readlines()]
 
-      with open(FileEnsurer.folder_names_path, "r") as file:
+      with open(FileEnsurer.google_folder_names_file_path, "r") as file:
          folder_names = [line.strip() for line in file.readlines()]
 
       return folder_ids, folder_names
