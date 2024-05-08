@@ -257,7 +257,7 @@ class Interface:
 
         ## gets rid of the files we just copied
         try:
-            shutil.rmtree(FileEnsurer.local_downloaded_files_actual_dir)
+            shutil.rmtree(FileEnsurer.local_downloaded_files_host_dir)
         except:
             pass
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
