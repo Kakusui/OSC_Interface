@@ -2,6 +2,7 @@
 import datetime
 import os
 import shutil
+import logging
 
 ## third party libraries
 from pydrive.auth import GoogleAuth
@@ -15,15 +16,16 @@ from modules.toolkit import Toolkit
 
 from handlers.file_handler import FileHandler
 
+
 class Interface:
 
     """
 
-    Used for interfacing with the OSC(Okisouchi)
+    Used for interfacing with the OSC (Okisouchi)
 
     """
 
-    marked_for_deletion = []
+    google_folder_ids_marked_for_deletion = []
 
     gauth:GoogleAuth
     drive:GoogleDrive
@@ -48,7 +50,7 @@ class Interface:
 
         FileEnsurer.setup_iteration_paths()
 
-        Interface.destination = FileHandler.standard_read_file(FileEnsurer.destination_dir)
+        Interface.destination = FileHandler.standard_read_file(FileEnsurer.target_location_path)
 
         ## if destination that we are transferring to does not exist than exit
         if(not os.path.exists(Interface.destination)):
@@ -88,7 +90,7 @@ class Interface:
 
         Toolkit.clear_console()
 
-        Interface.setup_scf_folder()
+        Interface.setup_local_download_folder_storage()
 
         Interface.download_files()
 
@@ -96,24 +98,19 @@ class Interface:
 
     ##    Interface.delete_files()
 
-        currentDate = datetime.datetime.now().strftime("%m/%d/%Y")
-
-        with open(FileEnsurer.last_run_path, "w+", encoding="utf-8") as file:
-            file.write(currentDate)
-
-##-------------------start-of-setup_scf_folder()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+##-------------------start-of-setup_local_download_folder_storage()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def setup_scf_folder() -> None:
+    def setup_local_download_folder_storage() -> None:
 
         """
         
-        Setups the scf folder.
+        Setups the local download folder storage.
 
         """
 
-        FileHandler.standard_create_directory(FileEnsurer.scf_host_dir)
-        FileHandler.standard_create_directory(FileEnsurer.scf_actual_dir)
+        FileHandler.standard_create_directory(FileEnsurer.local_downloaded_files_host_dir)
+        FileHandler.standard_create_directory(FileEnsurer.local_downloaded_files_actual_dir)
         
         for path in FileEnsurer.dirs.values():
             FileHandler.standard_create_directory(path)
@@ -137,22 +134,23 @@ class Interface:
 
         for i, id in enumerate(FileEnsurer.ids):
 
-            if(i >= 6):
-                break
 
             id = id.strip()
             query = "mimeType != 'application/vnd.google-apps.folder' and trashed = false and '{}' in parents".format(id)
             fileList = Interface.drive.ListFile({'q': query}).GetList()
 
             for drive_file in fileList:
-                Interface.marked_for_deletion.append(drive_file['id'])
-
+        
                 downloaded_file = Interface.drive.CreateFile({'id': drive_file['id']})
 
                 file_path = Interface.get_file_path(i + 1)
 
-                print("Downloading {} as {}".format(downloaded_file['title'], file_path + "." + drive_file['fileExtension']))
+                logging.info("Downloading {} as {}".format(downloaded_file['title'], file_path + "." + drive_file['fileExtension']))
+
                 downloaded_file.GetContentFile(file_path + "." + drive_file['fileExtension'])
+
+                Interface.google_folder_ids_marked_for_deletion.append(drive_file['id'])
+                logging.info("Marking {} for deletion".format(downloaded_file['title']))
 
 ##-------------------start-of-delete_files()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -168,23 +166,22 @@ class Interface:
         i = 0
 
         service = discovery.build('drive', 'v3', credentials=Interface.gauth.credentials)
-        batch:BatchHttpRequest = service.new_batch_http_request()
+        batch:BatchHttpRequest = service.new_batch_http
 
-        for id in Interface.marked_for_deletion:
+        for id in Interface.google_folder_ids_marked_for_deletion:
 
             id = id.strip()
 
             f = Interface.drive.CreateFile({'id':  id})
 
-            print("Trashing {}".format(f['title']))
+            logging.info("Trashing {}".format(f['title']))
 
             batch.add(service.files().delete(fileId=f['id']))
             i += 1
 
         if(i != 0):
-            print("Deleting Files")
-
-        batch.execute()
+            logging.info("Deleting {} files".format(i))
+            batch.execute()
 
 #-------------------Start-of-get_file_path()-------------------------------------------------
 
@@ -219,6 +216,7 @@ class Interface:
                 break
 
             except PermissionError:
+                logging.warning(f"Permission Error: {file_path} cannot be accessed")
                 pass
 
         return file_path
@@ -234,18 +232,15 @@ class Interface:
 
         """
 
-        with open(FileEnsurer.file_paths_path , "r+", encoding="utf-8") as file:
+        with open(FileEnsurer.transfer_file_paths , "r+", encoding="utf-8") as file:
             folders_to_copy = file.readlines()
 
-        with open(FileEnsurer.blacklist_path , "r+", encoding="utf-8") as file:
-            blacklist = file.readlines()
+        ## destination folder for the downloaded files
+        downloaded_folders_destination_path = os.path.join(Interface.destination, FileEnsurer.downloaded_files_directory_name)
 
-        ## destination folder for the scf folder
-        destination_scf = os.path.join(Interface.destination, "SCF")
+        logging.info("Merging Files from Local to Destination")
 
-        print("Merging SCF Folders")
-
-        Interface.merge_directories(FileEnsurer.scf_actual_dir, destination_scf, overwrite=True)
+        Interface.merge_directories(FileEnsurer.local_downloaded_files_actual_dir, downloaded_folders_destination_path, overwrite=True)
 
         print("Merging Files from Local to Destination")
 
@@ -260,8 +255,7 @@ class Interface:
 
         ## gets rid of the files we just copied
         try:
-            shutil.rmtree(FileEnsurer.scf_host_dir)
-
+            shutil.rmtree(FileEnsurer.local_downloaded_files_actual_dir)
         except:
             pass
 ##-------------------start-of-merge_directories()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -304,5 +298,18 @@ class Interface:
                     Interface.merge_directories(source_item, destination_item, overwrite)
 
 ##-------------------start-of-main()---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## setup logging
+logging.basicConfig(level=logging.DEBUG, 
+                    filename='osc_interface.log', 
+                    filemode='w', 
+                    format='[%(asctime)s] [%(levelname)s] [%(filename)s] %(message)s', 
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] [%(filename)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
 
 Interface.start_interaction()
