@@ -1,9 +1,7 @@
 ## built-in libraries
 import os
 import typing
-
-## custom modules
-from modules.logger import Logger
+import logging
 
 class FileHandler():
 
@@ -29,7 +27,7 @@ class FileHandler():
 
         if(os.path.isdir(directory_path) == False):
             os.mkdir(directory_path)
-            Logger.log_action(directory_path + " was created due to lack of the folder.")
+            logging.info(directory_path + " was created due to lack of the folder.")
 
 ##--------------------start-of-modified_create_directory()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -51,7 +49,7 @@ class FileHandler():
 
             reason = f"was created due to lack of {directory_path}." if os.path.isdir(directory_path) == False else f"was created due to {path_to_check} being blank or empty."
 
-            Logger.log_action(directory_path + " " + reason)
+            logging.info(directory_path + " " + reason)
 
 ##--------------------start-of-standard_create_file()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -68,7 +66,7 @@ class FileHandler():
         """
 
         if(os.path.exists(file_path) == False):
-            Logger.log_action(file_path + " was created due to lack of the file.")
+            logging.info(file_path + " was created due to lack of the file.")
             with open(file_path, "w+", encoding="utf-8") as file:
                 file.truncate()
 
@@ -94,13 +92,13 @@ class FileHandler():
         did_overwrite = False
 
         if(os.path.exists(file_path) == False or os.path.getsize(file_path) == 0):
-            Logger.log_action(file_path + " was created due to lack of the file or because it is blank.")
+            logging.info(file_path + " was created due to lack of the file or because it is blank.")
             with open(file_path, "w+", encoding="utf-8") as file:
                 file.write(content_to_write)
 
                 if(omit):
                     content_to_write = "(Content was omitted.)"
-                Logger.log_action(file_path + " was written to with the following content: " + content_to_write)
+                logging.info(file_path + " was created and written to with the following content: " + content_to_write)
 
             did_overwrite = True
 
@@ -131,7 +129,7 @@ class FileHandler():
         if(omit):
             content_to_write = "(Content was omitted.)"
         
-        Logger.log_action(file_path + " was overwritten with the following content: " + content_to_write)
+        logging.info(file_path + " was overwritten with the following content: " + content_to_write)
 
 ##--------------------start-of-clear_file()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -150,8 +148,8 @@ class FileHandler():
         with open(file_path, "w+", encoding="utf-8") as file:
             file.truncate()
 
-        Logger.log_action(file_path + " was cleared.")
-
+        logging.info(file_path + " was cleared.")
+        
 ##--------------------start-of-standard_read_file()------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
