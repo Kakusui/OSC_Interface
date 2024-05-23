@@ -10,3 +10,4 @@ handlers/__pycache__/
 SCF/
 LocalConfig/
 
+osc_interface.log
