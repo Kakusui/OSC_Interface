@@ -1,3 +1,7 @@
+## Copyright 2024 Kakusui LLC (https://kakusui.org/Okisouchi) (https://github.com/Kakusui) (https://github.com/Kakusui/osc_interface)
+## Use of this source code is governed by a GNU General Public License v3.0
+## license that can be found in the LICENSE file.
+
 ## built-in modules
 import os
 
